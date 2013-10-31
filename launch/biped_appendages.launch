@@ -1,0 +1,36 @@
+<launch>
+
+        <param name="robot_name" value="George" />        
+        <param name="NAppendages" value="5" />
+        
+        <!-- rightleg -->
+        <param name="appendage_name0" value="RLeg" />
+        <param name="nservos0" value="6" />
+        <param name="firstservo0" value="1" />
+        <param name="joints0" value="RWaist,RHip,RKnee,RAnkleBend,RAnkleRotate,RAnkleTilt" />
+
+        <!-- leftleg -->
+        <param name="appendage_name1" value="LLeg" />
+        <param name="nservos1" value="6" />
+        <param name="firstservo1" value="7" />
+        <param name="joints1" value="LWaist,LHip,LKnee,LAnkleBend,LAnkleRotate,LAnkleTilt" />
+
+        <!-- left arm -->
+        <param name="appendage_name2" value="LArm" />
+        <param name="nservos2" value="4" />
+        <param name="firstservo2" value="13" />
+        <param name="joints2" value="LShoulder,LElbow,LWristTwist,LWristFlex" />
+
+        <!-- Right arm -->
+        <param name="appendage_name3" value="RArm" />
+        <param name="nservos3" value="4" />
+        <param name="firstservo3" value="17" />
+        <param name="joints3" value="RShoulder,RElbow,RWristTwist,RHand" />
+
+        <!-- Head -->
+        <param name="appendage_name4" value="Head" />
+        <param name="nservos4" value="1" />
+        <param name="firstservo4" value="21" />
+        <param name="joints4" value="Head" />
+        
+</launch>

@@ -1,18 +1,94 @@
 <library path="src">
-  <class name="My Plugin" type="rqt_george.servo_slider.RArmSliderPlugin" base_class_type="rqt_gui_py::Plugin">
+  <class name="RArmPlugin" type="rqt_george.servo_slider.RArmSliderPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
       An example Python GUI plugin to create a great user interface.
     </description>
     <qtgui>
-      <!-- optional grouping...
       <group>
-        <label>Group</label>
+        <label>George</label>
       </group>
+      <!-- optional grouping...
       <group>
         <label>Subgroup</label>
       </group>
       -->
-      <label>George servo slider control</label>
+      <label>George Right Arm Servos</label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class>
+  
+  <class name="LArmPlugin" type="rqt_george.servo_slider.LArmSliderPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>George Left Arm servos</label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class>
+
+  <class name="RLegPlugin" type="rqt_george.servo_slider.RLegSliderPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>George Right Leg servos</label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class>
+
+  <class name="LLegPlugin" type="rqt_george.servo_slider.LLegSliderPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>George Left Leg servos</label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class>
+
+  <class name="HeadPlugin" type="rqt_george.servo_slider.HeadSliderPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <!-- optional grouping...
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>George Head servos</label>
       <icon type="theme">system-help</icon>
       <statustip>George plugin</statustip>
     </qtgui>
