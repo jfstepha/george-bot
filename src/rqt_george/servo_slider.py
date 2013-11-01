@@ -8,6 +8,8 @@ from python_qt_binding import QtCore
 from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QWidget
+from george.msg import Appendage_state
+from std_msgs.msg import String
 
 from robotDescription import *
 robot_description = RobotDescription()
@@ -24,26 +26,40 @@ class Communicate(QtCore.QObject):
 class sliderPanel(QtGui.QWidget):
 ##########################################################################
 ##########################################################################
-    def __init__(self, name):
+    def __init__(self, name, index, caller_change_callback):
+        self.caller_change_callback = caller_change_callback
+        self.index = index
+        self.name = name
         QtGui.QWidget.__init__(self)
         self.panelLayout = QtGui.QGridLayout()
         self.setLayout(self.panelLayout)
         self.slider = QtGui.QSlider( QtCore.Qt.Horizontal )
+        self.slider.setMaximum(180)
+        self.slider.setMinimum(0)
         self.lblName = QtGui.QLabel( name )
         self.prog = QtGui.QProgressBar()
         self.panelLayout.addWidget(self.lblName,0,0)
         self.panelLayout.addWidget(self.slider, 0, 1)
         self.panelLayout.addWidget(self.prog, 1, 1)
+        self.slider.valueChanged.connect( self.on_slider_changed )
+        
+    def on_slider_changed(self, value):
+        print("Slider %d of %s changed value: %d" % (self.index, self.name, value))
+        self.caller_change_callback(self.index, value)
         
 
 ##########################################################################
 ##########################################################################
 class SliderPlugin(Plugin):
+    '''
+    This is the parent class for an appendage slider control panel.  Each
+    appendage has a separate child class.
+    '''
 ##########################################################################
 ##########################################################################
 
     def __init__(self, context):
-        robot_description.ReadParameters()
+        self.init_ros_params()
         # robot_description.Print()
 
         super(SliderPlugin, self).__init__(context)
@@ -69,7 +85,7 @@ class SliderPlugin(Plugin):
         jointnames = robot_description.appendages[ self.appendage_no ].jointnames
         self.panels = []
         for i in range( self.npanels ):
-            self.panels.append( sliderPanel( jointnames[ i ] ) )
+            self.panels.append( sliderPanel( jointnames[ i ], i, self.slider_changed_callback ) )
             self.mainLayout.addWidget( self.panels[ i ] )
 
         # central widget
@@ -100,8 +116,33 @@ class SliderPlugin(Plugin):
         
         #self.c.slider1.connect( self.panel1.slider.setValue )
         #self.panel1.slider.valueChanged.connect( self.on_slider1_changed )
+
+    def init_ros_params(self):
+        robot_description.ReadParameters()
+        self.command_pub = rospy.Publisher("command" + str(self.appendage_no), Appendage_state)
+        self.command_msg = Appendage_state()
+        self.command_msg.joints = [0] * 6
+        self.command_msg.speed = 1
+        
+        self.macro_cmd_sub = rospy.Subscriber("macro_cmd", String, self.macro_cmd_callback, None, 100)
+        
+        self.joint_state_sub = rospy.Subscriber("joint_states" + str(self.appendage_no), Appendage_state, self.joint_states_callback, None, 1)
+        self.joint_state_msg = Appendage_state()
+        self.joint_state_msg.joints = [90] * 6
+        self.joint_state_msg.speed = 1
+
+    def slider_changed_callback(self, slider_no, value):
+        print "Slider changed callback, slider %d value: %d" % (slider_no, value)
+        self.command_msg.joints[slider_no] = value
+        self.command_pub.publish( self.command_msg )
         
 
+    def macro_cmd_callback(self, msg):
+        pass
+    
+    def joint_states_callback(self, msg):
+        pass
+    
     def shutdown_plugin(self):
         # TODO unregister all publishers here
         pass
@@ -152,7 +193,6 @@ class LArmSliderPlugin(SliderPlugin):
         
     def on_slider1_changed(self, value):
         print "Slider1 changed! Value=%d" % value
-        self.c.slider1 = value
         self.panel1.prog.setValue(value)
     
 ##########################################################################

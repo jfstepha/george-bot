@@ -1,4 +1,4 @@
 <launch>
 	<include file="$(find george)/launch/biped_appendages.launch" />
-	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui"/>
+	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen"/>
 </launch>
