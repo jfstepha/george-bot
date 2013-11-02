@@ -9,6 +9,7 @@ from qt_gui.plugin import Plugin
 from python_qt_binding import loadUi
 from python_qt_binding.QtGui import QWidget
 from george.msg import Appendage_state
+from sensor_msgs.msg import JointState
 from std_msgs.msg import String
 
 from robotDescription import *
@@ -18,8 +19,7 @@ robot_description = RobotDescription()
 class Communicate(QtCore.QObject):
 ##########################################################################
 ##########################################################################
-    slider1 = QtCore.Signal(int)
-    pbar1_val = QtCore.Signal(int)
+    pbar_val = QtCore.Signal(int)
     
 ##########################################################################
 ##########################################################################
@@ -27,6 +27,7 @@ class sliderPanel(QtGui.QWidget):
 ##########################################################################
 ##########################################################################
     def __init__(self, name, index, caller_change_callback):
+        self.c = Communicate()
         self.caller_change_callback = caller_change_callback
         self.index = index
         self.name = name
@@ -38,14 +39,21 @@ class sliderPanel(QtGui.QWidget):
         self.slider.setMinimum(0)
         self.lblName = QtGui.QLabel( name )
         self.prog = QtGui.QProgressBar()
+        self.prog.setMinimum(0)
+        self.prog.setMaximum(180)
         self.panelLayout.addWidget(self.lblName,0,0)
         self.panelLayout.addWidget(self.slider, 0, 1)
         self.panelLayout.addWidget(self.prog, 1, 1)
         self.slider.valueChanged.connect( self.on_slider_changed )
-        
+        self.c.pbar_val.connect( self.prog.setValue)
+
     def on_slider_changed(self, value):
         print("Slider %d of %s changed value: %d" % (self.index, self.name, value))
         self.caller_change_callback(self.index, value)
+    def set_progressbar(self, value):
+        print "-D- set_progressbar %s (%d) to %0.3f" % (self.name, self.index, value)
+        self.c.pbar_val.emit(value)
+
         
 
 ##########################################################################
@@ -126,7 +134,7 @@ class SliderPlugin(Plugin):
         
         self.macro_cmd_sub = rospy.Subscriber("macro_cmd", String, self.macro_cmd_callback, None, 100)
         
-        self.joint_state_sub = rospy.Subscriber("joint_states" + str(self.appendage_no), Appendage_state, self.joint_states_callback, None, 1)
+        self.joint_state_sub = rospy.Subscriber("joint_states" + str(self.appendage_no), JointState, self.joint_states_callback, None, 1)
         self.joint_state_msg = Appendage_state()
         self.joint_state_msg.joints = [90] * 6
         self.joint_state_msg.speed = 1
@@ -141,7 +149,9 @@ class SliderPlugin(Plugin):
         pass
     
     def joint_states_callback(self, msg):
-        pass
+        print "-D- joint_states_callback msg: %s " % msg
+        for i in range( len( msg.position ) ):
+            self.panels[i].set_progressbar(msg.position[i])
     
     def shutdown_plugin(self):
         # TODO unregister all publishers here

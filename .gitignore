@@ -1,2 +1,4 @@
 src/rqt_george/*.pyc
 src/*.pyc
+.project
+.pydevproject
