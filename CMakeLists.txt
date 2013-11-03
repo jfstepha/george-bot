@@ -84,7 +84,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES george
-  CATKIN_DEPENDS rospy rqt_gui rqt_gui_py message_runtime
+  CATKIN_DEPENDS rospy rqt_gui rqt_gui_py message_runtime common_msgs
 #  DEPENDS system_lib
 )
 
