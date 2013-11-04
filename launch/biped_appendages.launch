@@ -6,13 +6,13 @@
         <!-- rightleg -->
         <param name="appendage_name0" value="RLeg" />
         <param name="nservos0" value="6" />
-        <param name="firstservo0" value="1" />
+        <param name="firstservo0" value="6" />
         <param name="joints0" value="RWaist,RHip,RKnee,RAnkleBend,RAnkleRotate,RAnkleTilt" />
 
         <!-- leftleg -->
         <param name="appendage_name1" value="LLeg" />
         <param name="nservos1" value="6" />
-        <param name="firstservo1" value="7" />
+        <param name="firstservo1" value="0" />
         <param name="joints1" value="LWaist,LHip,LKnee,LAnkleBend,LAnkleRotate,LAnkleTilt" />
 
         <!-- left arm -->
