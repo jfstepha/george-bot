@@ -1,20 +1,29 @@
 #!/usr/bin/env python
 
 import rospy
+import os
+import sys
 from george.msg import Appendage_state
 from sensor_msgs.msg import JointState
 
 from robotDescription import *
+
+path = os.path.dirname(__file__) + "/../src/"
+sys.path.append(path)
+
+from Adafruit_PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
+import time
 
 ##################################################################################################################
 ##################################################################################################################
 class msgHandler():
 ##################################################################################################################
 ##################################################################################################################
-    def __init__(self, appendage_no ):
+    def __init__(self, appendage_no, pwm ):
         self.robot_description = RobotDescription()
         self.robot_description.ReadParameters()
         self.an = appendage_no
+        self.pwm = pwm
         self.jsPub = rospy.Publisher( "joint_states" + str(self.an), JointState )
         print "msgHandler got robot description: %s " % str(self.robot_description)
     def cmd_callback(self, val):
@@ -23,13 +32,22 @@ class msgHandler():
         js = JointState() 
         njoints = self.robot_description.appendages[self.an].nservos
         for i in range( njoints ):
+            self.setServo(i, val.joints[i] )
             js.name.append( self.robot_description.appendages[self.an].jointnames[i])
-            print "val.joints = %d" % val.joints[i]
+            # print "val.joints = %d" % val.joints[i]
             js.position.append( val.joints[i] * 1.0)
             js.velocity.append( 0.0 )
             js.effort.append( 0.0 )
             
         self.jsPub.publish( js )
+
+    def setServo(self,channel, angle):
+        pulse = angle * (self.servoMax - self.servoMin) / 180 + self.servoMin 
+        # print "Angle = %d, setting pwm to %0.3f on channel %d" % (angle, pulse, channel)
+
+        self.pwm.setPWM(channel,0, pulse)
+
+
 
 ##################################################################################################################
 ##################################################################################################################
@@ -50,14 +68,27 @@ class messageHandler():
         
         ### set up command message subscriptions ########
         self.prev_msg = [] * self.robot_description.NAppendages
+        self.servo_setup()
         for i in range( self.robot_description.NAppendages ):
             njoints = len( self.robot_description.appendages[i].jointnames )
             prev_msg_tmp = [255] * njoints
             self.prev_msg.append(prev_msg_tmp)
             rospy.loginfo("-D- jointstate_to_pi setting up appendage #%d" % i)
-            s = msgHandler( i )
+            s = msgHandler( i, self.pwm )
+            s.servoMax = self.servoMax
+            s.servoMin = self.servoMin
             self.command_sub.append( rospy.Subscriber( "command"+str(i), Appendage_state, s.cmd_callback ) )
             self.servo_handlers.append( s )
+            
+    def servo_setup(self):
+        self.pwm = PWM(0x40, debug=True)
+        self.pwm.setPWMFreq(60)
+        #self.setServoPulse( 0, 0)
+
+        self.servoMin = 150  # Min pulse length out of 4096
+        self.servoMax = 600  # Max pulse length out of 4096
+        
+
             
     def spin(self):
         while not(rospy.is_shutdown()):
