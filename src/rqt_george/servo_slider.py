@@ -37,6 +37,7 @@ class sliderPanel(QtGui.QWidget):
         self.slider = QtGui.QSlider( QtCore.Qt.Horizontal )
         self.slider.setMaximum(180)
         self.slider.setMinimum(0)
+        self.slider.setValue(90)
         self.lblName = QtGui.QLabel( name )
         self.prog = QtGui.QProgressBar()
         self.prog.setMinimum(0)
@@ -46,10 +47,16 @@ class sliderPanel(QtGui.QWidget):
         self.panelLayout.addWidget(self.prog, 1, 1)
         self.slider.valueChanged.connect( self.on_slider_changed )
         self.c.pbar_val.connect( self.prog.setValue)
-
+        self.max_update_rate = 20 # msec
+        self.last_changed = rospy.Time.now()
+        
     def on_slider_changed(self, value):
-        print("Slider %d of %s changed value: %d" % (self.index, self.name, value))
-        self.caller_change_callback(self.index, value)
+        dt_duration = rospy.Time.now() - self.last_changed
+        print("Slider %d of %s changed value: %d, time since last update: %0.3f" % (self.index, self.name, value, dt_duration.to_sec()))
+        if dt_duration.to_sec() * 100 > self.max_update_rate / 100:
+            print("-D- calling publish")
+            self.caller_change_callback(self.index, value)
+            self.last_changed = rospy.Time.now()
     def set_progressbar(self, value):
         print "-D- set_progressbar %s (%d) to %0.3f" % (self.name, self.index, value)
         self.c.pbar_val.emit(value)
