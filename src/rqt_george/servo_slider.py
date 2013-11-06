@@ -13,6 +13,7 @@ from sensor_msgs.msg import JointState
 from std_msgs.msg import String
 
 from robotDescription import *
+from george.srv import *
 robot_description = RobotDescription()
 ##########################################################################
 ##########################################################################
@@ -20,6 +21,87 @@ class Communicate(QtCore.QObject):
 ##########################################################################
 ##########################################################################
     pbar_val = QtCore.Signal(int)
+
+##########################################################################
+##########################################################################
+class buttonPanel(QtGui.QWidget):
+##########################################################################
+##########################################################################
+    def __init__(self, parent):
+        
+        QtGui.QWidget.__init__(self)
+        self.parent = parent
+
+        self.srv_home = rospy.ServiceProxy('home', Home)
+        self.srv_stop = rospy.ServiceProxy('stop', Stop)
+        
+        self.panelLayout = QtGui.QHBoxLayout()
+        self.setLayout(self.panelLayout)
+        
+        self.speed_text = QtGui.QLineEdit()
+        self.speed_text.setText("1")
+        self.speed_text.maximumSize = [120,113]
+        self.speed_text.textChanged.connect( self.on_speed_text_changed )
+
+        self.home_button = QtGui.QPushButton()
+        self.home_button.setText('Home')
+        self.home_button.clicked.connect( self.on_home_button_clicked )
+        
+        self.stop_button = QtGui.QPushButton()
+        self.stop_button.setText("Stop")
+        self.stop_button.clicked.connect( self.on_stop_button_clicked )
+        
+        self.copy_button = QtGui.QPushButton()
+        self.copy_button.setText("Copy Positions")
+        self.copy_button.clicked.connect( self.on_copy_button_clicked)
+        
+        self.send_button = QtGui.QPushButton()
+        self.send_button.setText("Send")
+        self.send_button.clicked.connect( self.on_send_button_clicked )
+        
+        self.auto_button = QtGui.QPushButton()
+        self.auto_button.setText("Auto Send")
+        self.auto_button.clicked.connect( self.on_auto_button_clicked )
+        self.auto_button.setCheckable(True)
+
+        self.panelLayout.addWidget(self.speed_text)
+        self.panelLayout.addWidget(self.home_button)
+        self.panelLayout.addWidget(self.stop_button)
+        self.panelLayout.addWidget(self.copy_button)
+        self.panelLayout.addWidget(self.send_button)
+        self.panelLayout.addWidget(self.auto_button)
+        
+    def on_home_button_clicked(self):
+        rospy.logdebug("home_button_clicked")
+        try:
+            self.auto_button.setChecked(False)
+            self.send_button.setEnabled(True)
+            resp = self.srv_home()
+        except rospy.ServiceException, e:
+            rospy.logerr("Service call failed: %s"%e)
+
+    def on_stop_button_clicked(self):
+        rospy.logdebug("stop_button_clicked")
+        try:
+            self.auto_button.setChecked(False)
+            self.send_button.setEnabled(True)
+            resp = self.srv_stop()
+        except rospy.ServiceException, e:
+            rospy.logerr("Service call failed: %s"%e)
+        
+    def on_copy_button_clicked(self):
+        rospy.logdebug("copy_button_clicked")
+        self.parent.copy_states()
+
+    def on_send_button_clicked(self):
+        rospy.logdebug("send_button_clicked")
+
+    def on_auto_button_clicked(self):
+        rospy.logdebug("auto_button_clicked")
+        
+    def on_speed_text_changed(self, value):
+        rospy.logdebug("speed text changed %d" % value)
+        
     
 ##########################################################################
 ##########################################################################
@@ -52,13 +134,13 @@ class sliderPanel(QtGui.QWidget):
         
     def on_slider_changed(self, value):
         dt_duration = rospy.Time.now() - self.last_changed
-        print("Slider %d of %s changed value: %d, time since last update: %0.3f" % (self.index, self.name, value, dt_duration.to_sec()))
+        rospy.logdebug("Slider %d of %s changed value: %d, time since last update: %0.3f" % (self.index, self.name, value, dt_duration.to_sec()))
         if dt_duration.to_sec() * 100 > self.max_update_rate / 100:
-            print("-D- calling publish")
+            rospy.logdebug("calling publish")
             self.caller_change_callback(self.index, value)
             self.last_changed = rospy.Time.now()
     def set_progressbar(self, value):
-        print "-D- set_progressbar %s (%d) to %0.3f" % (self.name, self.index, value)
+        rospy.logdebug("set_progressbar %s (%d) to %0.3f" % (self.name, self.index, value))
         self.c.pbar_val.emit(value)
 
         
@@ -81,6 +163,7 @@ class SliderPlugin(Plugin):
         # Give QObjects reasonable names
         self.setObjectName(self.formname)
 
+
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
         parser = ArgumentParser()
@@ -102,6 +185,9 @@ class SliderPlugin(Plugin):
         for i in range( self.npanels ):
             self.panels.append( sliderPanel( jointnames[ i ], i, self.slider_changed_callback ) )
             self.mainLayout.addWidget( self.panels[ i ] )
+            
+        self.button_panel = buttonPanel(self)
+        self.mainLayout.addWidget( self.button_panel )
 
         # central widget
         self.form1 = QWidget()
@@ -127,6 +213,10 @@ class SliderPlugin(Plugin):
         #context.add_widget(self.ui)
         context.add_widget(self.form1)
         
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect( self.on_timer_update)
+        self.timer.start(1000)
+        
         self.c = Communicate()
         
         #self.c.slider1.connect( self.panel1.slider.setValue )
@@ -147,18 +237,31 @@ class SliderPlugin(Plugin):
         self.joint_state_msg.speed = 1
 
     def slider_changed_callback(self, slider_no, value):
-        print "Slider changed callback, slider %d value: %d" % (slider_no, value)
+        rospy.logdebug( "Slider changed callback, slider %d value: %d" % (slider_no, value))
         self.command_msg.joints[slider_no] = value
+        self.command_publish()
+        
+    def command_publish(self):
         self.command_pub.publish( self.command_msg )
         
-
     def macro_cmd_callback(self, msg):
         pass
     
     def joint_states_callback(self, msg):
-        print "-D- joint_states_callback msg: %s " % msg
+        rospy.logdebug( "joint_states_callback msg: %s " % msg)
         for i in range( len( msg.position ) ):
             self.panels[i].set_progressbar(msg.position[i])
+            
+    def copy_states(self):
+        rospy.logdebug( "-D- in copy_states")
+        for i in range( self.npanels ):
+            self.panels[i].slider.setValue( self.panels[i].prog.value() )
+            
+    def on_timer_update(self):
+        rospy.logdebug( "-D- tick")
+        if self.button_panel.auto_button.isChecked():
+            rospy.logdebug("publishing")
+            self.command_publish()
     
     def shutdown_plugin(self):
         # TODO unregister all publishers here
