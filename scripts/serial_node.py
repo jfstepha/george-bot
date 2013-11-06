@@ -19,11 +19,12 @@ import time
 class msgHandler():
 ##################################################################################################################
 ##################################################################################################################
-    def __init__(self, appendage_no, pwm ):
+    def __init__(self, appendage_no, pwm, pwm2 ):
         self.robot_description = RobotDescription()
         self.robot_description.ReadParameters()
         self.an = appendage_no
         self.pwm = pwm
+        self.pwm2 = pwm2
         self.jsPub = rospy.Publisher( "joint_states" + str(self.an), JointState )
         print "msgHandler got robot description: %s " % str(self.robot_description)
     def cmd_callback(self, val):
@@ -32,7 +33,7 @@ class msgHandler():
         js = JointState() 
         njoints = self.robot_description.appendages[self.an].nservos
         for i in range( njoints ):
-            self.setServo(i, val.joints[i] )
+            self.setServo(self.robot_description.appendages[self.an].firstservo + i, val.joints[i] )
             js.name.append( self.robot_description.appendages[self.an].jointnames[i])
             # print "val.joints = %d" % val.joints[i]
             js.position.append( val.joints[i] * 1.0)
@@ -45,7 +46,10 @@ class msgHandler():
         pulse = angle * (self.servoMax - self.servoMin) / 180 + self.servoMin 
         # print "Angle = %d, setting pwm to %0.3f on channel %d" % (angle, pulse, channel)
 
-        self.pwm.setPWM(channel,0, pulse)
+        if channel < 16:
+            self.pwm2.setPWM(channel - 16, 0, pulse)
+        else:
+            self.pwm.setPWM(channel,0, pulse)
 
 
 
@@ -74,7 +78,7 @@ class messageHandler():
             prev_msg_tmp = [255] * njoints
             self.prev_msg.append(prev_msg_tmp)
             rospy.loginfo("-D- jointstate_to_pi setting up appendage #%d" % i)
-            s = msgHandler( i, self.pwm )
+            s = msgHandler( i, self.pwm, self.pwm2 )
             s.servoMax = self.servoMax
             s.servoMin = self.servoMin
             self.command_sub.append( rospy.Subscriber( "command"+str(i), Appendage_state, s.cmd_callback ) )
@@ -82,7 +86,9 @@ class messageHandler():
             
     def servo_setup(self):
         self.pwm = PWM(0x40, debug=True)
+        self.pwm2 = PWM(0x41, debug=True)
         self.pwm.setPWMFreq(60)
+        self.pwm2.setPWMFreq(60)
         #self.setServoPulse( 0, 0)
 
         self.servoMin = 150  # Min pulse length out of 4096
