@@ -30,7 +30,7 @@
         <!-- Head -->
         <param name="appendage_name4" value="Head" />
         <param name="nservos4" value="1" />
-        <param name="firstservo4" value="21" />
+        <param name="firstservo4" value="24" />
         <param name="joints4" value="Head" />
         
 </launch>
