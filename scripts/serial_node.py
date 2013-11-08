@@ -28,7 +28,7 @@ class msgHandler():
         self.jsPub = rospy.Publisher( "joint_states" + str(self.an), JointState )
         print "msgHandler got robot description: %s " % str(self.robot_description)
     def cmd_callback(self, val):
-        print "-D- in servoHandler servo_callback appendage_no %d val:%s" % (self.an, str(val) )
+        rospy.logdebug( "-D- in servoHandler servo_callback appendage_no %d val:%s" % (self.an, str(val) ) )
         # import pdb; pdb.set_trace()
         js = JointState() 
         njoints = self.robot_description.appendages[self.an].nservos
@@ -41,15 +41,16 @@ class msgHandler():
             js.effort.append( 0.0 )
             
         self.jsPub.publish( js )
+        #print "-D- servoHandler servo_callback DONE appendage_no %d val:%s" % (self.an, str(val) )
 
     def setServo(self,channel, angle):
         pulse = angle * (self.servoMax - self.servoMin) / 180 + self.servoMin 
         # print "Angle = %d, setting pwm to %0.3f on channel %d" % (angle, pulse, channel)
 
         if channel < 16:
-            self.pwm2.setPWM(channel - 16, 0, pulse)
+            self.pwm.setPWM(channel, 0, pulse)
         else:
-            self.pwm.setPWM(channel,0, pulse)
+            self.pwm2.setPWM(channel - 16,0, pulse)
 
 
 
