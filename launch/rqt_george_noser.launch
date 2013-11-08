@@ -1,0 +1,6 @@
+<launch>
+	<include file="$(find george)/launch/biped_appendages.launch" />
+	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen"/>
+	<node pkg="george" type="home.py" name="home" output="screen"/>
+	<node pkg="george" type="stop.py" name="stop" output="screen"/>
+</launch>

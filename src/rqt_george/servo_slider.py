@@ -95,6 +95,7 @@ class buttonPanel(QtGui.QWidget):
 
     def on_send_button_clicked(self):
         rospy.logdebug("send_button_clicked")
+        self.parent.command_publish( docheck=False)
 
     def on_auto_button_clicked(self):
         rospy.logdebug("auto_button_clicked")
@@ -181,6 +182,7 @@ class SliderPlugin(Plugin):
         # Create the panels
         self.npanels = robot_description.appendages[ self.appendage_no ].nservos
         jointnames = robot_description.appendages[ self.appendage_no ].jointnames
+        self.prev_cmd_joints = []
         self.panels = []
         for i in range( self.npanels ):
             self.panels.append( sliderPanel( jointnames[ i ], i, self.slider_changed_callback ) )
@@ -215,7 +217,7 @@ class SliderPlugin(Plugin):
         
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect( self.on_timer_update)
-        self.timer.start(1000)
+        self.timer.start(50)
         
         self.c = Communicate()
         
@@ -226,7 +228,7 @@ class SliderPlugin(Plugin):
         robot_description.ReadParameters()
         self.command_pub = rospy.Publisher("command" + str(self.appendage_no), Appendage_state)
         self.command_msg = Appendage_state()
-        self.command_msg.joints = [0] * 6
+        self.command_msg.joints = [90] * 6
         self.command_msg.speed = 1
         
         self.macro_cmd_sub = rospy.Subscriber("macro_cmd", String, self.macro_cmd_callback, None, 100)
@@ -239,10 +241,28 @@ class SliderPlugin(Plugin):
     def slider_changed_callback(self, slider_no, value):
         rospy.logdebug( "Slider changed callback, slider %d value: %d" % (slider_no, value))
         self.command_msg.joints[slider_no] = value
-        self.command_publish()
+        # self.command_publish()
         
-    def command_publish(self):
-        self.command_pub.publish( self.command_msg )
+    def command_publish(self, docheck=True):
+        rospy.logdebug("publishing command message for appendage " + str(self.appendage_no) )
+        if docheck == False or self.is_changed( self.command_msg ):
+            self.command_pub.publish( self.command_msg )
+        
+    def is_changed(self, cmd_msg):
+        retval = False
+
+        if len( self.prev_cmd_joints ) == len( cmd_msg.joints ):
+            for i in range( len( cmd_msg.joints ) ) :
+                if self.prev_cmd_joints[i] != cmd_msg.joints[i]:
+                    retval = True
+                    self.prev_cmd_joints[i] = cmd_msg.joints[i]
+        else:
+            # prev_cmd has not been initialized
+            self.prev_cmd_joints = []
+            for i in range( len( cmd_msg.joints ) ) :
+                self.prev_cmd_joints.append(cmd_msg.joints[i])
+            retval = True
+        return( retval )
         
     def macro_cmd_callback(self, msg):
         pass
@@ -258,10 +278,10 @@ class SliderPlugin(Plugin):
             self.panels[i].slider.setValue( self.panels[i].prog.value() )
             
     def on_timer_update(self):
-        rospy.logdebug( "-D- tick")
+       #rospy.logdebug( "-D- tick")
         if self.button_panel.auto_button.isChecked():
             rospy.logdebug("publishing")
-            self.command_publish()
+            self.command_publish( )
     
     def shutdown_plugin(self):
         # TODO unregister all publishers here
@@ -307,7 +327,7 @@ class LArmSliderPlugin(SliderPlugin):
     def __init__(self, context):
         print "Left Arm Init"
         self.formname = "Left Arm"
-        self.appendage_no = 3
+        self.appendage_no = 2
         SliderPlugin.__init__(self, context)
         
         
