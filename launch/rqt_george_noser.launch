@@ -3,4 +3,6 @@
 	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen"/>
 	<node pkg="george" type="home.py" name="home" output="screen"/>
 	<node pkg="george" type="stop.py" name="stop" output="screen"/>
+    <param name="robot_description" textfile="$(find george)/urdf/george.urdf" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 </launch>

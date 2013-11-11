@@ -1,0 +1,55 @@
+george:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+  
+  # Position Controllers ---------------------------------------
+  joint0_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RWaist
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint1_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RHip
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint2_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RKnee
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint3_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RAnkleBend
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint4_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RAnkleRotate
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint5_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RAnkleTilt
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint6_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LWaist
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint7_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LHip
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint8_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LKnee
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint9_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LAnkleBend
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint10_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LAnkleRotate
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint11_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LAnkleTilt
+    pid: {p: 100.0, i: 0.01, d: 0.01}

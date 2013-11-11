@@ -31,6 +31,8 @@ class buttonPanel(QtGui.QWidget):
         
         QtGui.QWidget.__init__(self)
         self.parent = parent
+        btnw = 40
+        btnh = 20
 
         self.srv_home = rospy.ServiceProxy('home', Home)
         self.srv_stop = rospy.ServiceProxy('stop', Stop)
@@ -41,28 +43,34 @@ class buttonPanel(QtGui.QWidget):
         self.speed_text = QtGui.QLineEdit()
         self.speed_text.setText("1")
         self.speed_text.maximumSize = [120,113]
+        self.speed_text.setMinimumSize(btnw,btnh)
         self.speed_text.textChanged.connect( self.on_speed_text_changed )
 
         self.home_button = QtGui.QPushButton()
         self.home_button.setText('Home')
         self.home_button.clicked.connect( self.on_home_button_clicked )
+        self.home_button.setMinimumSize(btnw,btnh)
         
         self.stop_button = QtGui.QPushButton()
         self.stop_button.setText("Stop")
         self.stop_button.clicked.connect( self.on_stop_button_clicked )
+        self.stop_button.setMinimumSize(btnw,btnh)
         
         self.copy_button = QtGui.QPushButton()
         self.copy_button.setText("Copy Positions")
         self.copy_button.clicked.connect( self.on_copy_button_clicked)
+        self.copy_button.setMinimumSize(btnw,btnh)
         
         self.send_button = QtGui.QPushButton()
         self.send_button.setText("Send")
         self.send_button.clicked.connect( self.on_send_button_clicked )
+        self.send_button.setMinimumSize(btnw,btnh)
         
         self.auto_button = QtGui.QPushButton()
         self.auto_button.setText("Auto Send")
         self.auto_button.clicked.connect( self.on_auto_button_clicked )
         self.auto_button.setCheckable(True)
+        self.auto_button.setMinimumSize(btnw,btnh)
 
         self.panelLayout.addWidget(self.speed_text)
         self.panelLayout.addWidget(self.home_button)
@@ -121,13 +129,21 @@ class sliderPanel(QtGui.QWidget):
         self.slider.setMaximum(180)
         self.slider.setMinimum(0)
         self.slider.setValue(90)
+        self.slider.setMinimumSize(100,10)
+        self.slider.setMinimumSize(100,10)
+
         self.lblName = QtGui.QLabel( name )
+        self.lblName.setMinimumSize(100,10)
+
         self.prog = QtGui.QProgressBar()
         self.prog.setMinimum(0)
         self.prog.setMaximum(180)
+        self.prog.setMinimumSize(100,10)
+
         self.panelLayout.addWidget(self.lblName,0,0)
         self.panelLayout.addWidget(self.slider, 0, 1)
         self.panelLayout.addWidget(self.prog, 1, 1)
+        
         self.slider.valueChanged.connect( self.on_slider_changed )
         self.c.pbar_val.connect( self.prog.setValue)
         self.max_update_rate = 20 # msec

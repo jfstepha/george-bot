@@ -1,0 +1,1143 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="george">
+  <!-- Import all Gazebo-customization elements, including Gazebo colors -->
+  <xacro:include filename="$(find george)/urdf/george.gazebo" />
+  
+  <xacro:property name="M_PI" value="3.1416" />
+  
+  <xacro:macro name="default_inertia">
+	<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+  </xacro:macro>
+  
+  <link name="base_link">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/torso_mm.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://george/meshes/torso_mm.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI}"/>
+    </collision> 
+<!--       <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+-->
+  </link>
+  
+  
+  <!-- *****  Servo macro **********  -->
+  <xacro:macro name="servo_body" params="prefix offset">
+    <link name="${prefix}_servo_body">
+      <visual>
+	<geometry>
+	  <box size=".040 .02 .0365"/>
+	</geometry>
+	<origin rpy="0 0 0" xyz="${offset} 0 -0.00825"/>
+	<material name="black">
+	  <color rgba=".1 .1 1 1"/>
+	</material>
+      </visual>
+      <collision>
+	<geometry>
+          <box size=".040 .02 .0365"/>
+	</geometry>
+	<origin rpy="0 0 0" xyz="${offset} 0 -0.00825"/>
+      </collision>
+      <inertial>
+	<mass value="0.045"/>
+	<xacro:default_inertia/>
+      </inertial>
+    </link>
+  
+  </xacro:macro>
+
+  <xacro:macro name="servo_parts" params="prefix offset">
+    <xacro:servo_body prefix="${prefix}" offset="${offset}"/>
+
+    <link name="${prefix}_servo_lip">
+      <visual>
+        <geometry>
+          <box size=".0528 .02 .002"/>
+        </geometry>
+        <origin rpy="0 0 0.001" xyz="0 0 0"/>
+        <material name="black">
+          <color rgba=".1 .1 1 1"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <box size=".0528 .02 .002"/>
+	</geometry>
+        <origin rpy="0 0 0.001" xyz="0 0 0"/>
+       </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+    </link>
+  
+    <link name="${prefix}_servo_horn">
+    <visual>
+      <geometry>
+        <cylinder length="0.001" radius="0.012"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -.0005"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.001" radius="0.012"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -.0005"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+ 
+  <!-- servo body parent - for use when the body is the parent -->
+  <xacro:macro name="servo_bp" params="prefix rot">
+    <xacro:servo_parts prefix="${prefix}" offset="0"/>
+    
+    <joint name="${prefix}_servo_lip_to_body" type="fixed">
+      <parent link="${prefix}_servo_body"/>
+      <child link="${prefix}_servo_lip"/>
+      <origin xyz="0 0 0"/>
+    </joint>
+  
+  
+  <joint name="${prefix}" type="revolute">
+    <axis xyz="0 0 -1"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="${prefix}_servo_body"/>
+    <child link="${prefix}_servo_horn"/>
+    <origin xyz=".01 0 0.0161" rpy="0 0 ${rot}"/>
+  </joint>
+  </xacro:macro>
+  
+  <!-- servo horn parent - for use when the body is the parent -->
+  <xacro:macro name="servo_hp" params="prefix rot">
+    <xacro:servo_parts prefix="${prefix}" offset="0.0161" />
+    
+    <joint name="${prefix}_servo_lip_to_body" type="fixed">
+      <parent link="${prefix}_servo_body"/>
+      <child link="${prefix}_servo_lip"/>
+      <origin xyz="0.0161 0 0"/>
+    </joint>
+  
+  
+  <joint name="${prefix}" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="${prefix}_servo_horn"/>
+    <child link="${prefix}_servo_body"/>
+    <origin xyz="0.0 0 -0.0161" rpy="0 0 ${rot}"/>
+  </joint>
+  </xacro:macro>
+  <!-- end servo macro -->
+  
+  
+  <!-- cbracket macro, visual origin at inside end -->
+  <xacro:macro name="cbracket_e" params="name">
+    <xacro:cbracket name="${name}" xyz="0 -0.0286 -0.0246" rpy="0 ${M_PI/2} 0"/>
+  </xacro:macro>
+  
+  <xacro:macro name="cbracket_s" params="name">
+    <xacro:cbracket name="${name}" xyz="0 0 0" rpy="-${M_PI/2} 0 0"/>
+  </xacro:macro>
+  
+  <xacro:macro name="cbracket" params="name xyz rpy">
+  <link name="${name}">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/cbracket-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<mesh filename="package://george/meshes/cbracket-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+  <!-- end multi purpose bracket -->
+  
+  <!-- multi purpose bracket macro A side as the parent -->
+  <xacro:macro name="mpbracket_a" params="name rot">
+    <xacro:mpbracket name="${name}" xyz="0 0 0" rpy="-${M_PI/2} 0 ${rot}"/>
+  </xacro:macro>
+  
+  <!-- multi purpose bracket macro B side as the parent -->
+  <xacro:macro name="mpbracket_b" params="name">
+    <xacro:mpbracket name="${name}" xyz="0 -0.0121 -0.0174" rpy="0 0 0"/>
+  </xacro:macro>
+  
+  <!-- multi purpose bracket macro C side as the parent -->
+  <xacro:macro name="mpbracket_c" params="name">
+    <xacro:mpbracket name="${name}" xyz="0.0161 0.0142 -0.0144" rpy="0 ${M_PI} ${M_PI}"/>
+  </xacro:macro>
+  
+  <!-- multi purpose bracket macro C side as the parent, rotated -->
+  <xacro:macro name="mpbracket_cr" params="name">
+    <xacro:mpbracket name="${name}" xyz="0.0161 -0.0142 -0.0144" rpy="0 ${M_PI} 0"/>
+  </xacro:macro>
+  
+  
+  <!-- multi purpose bracket macro -->
+  <xacro:macro name="mpbracket" params="name xyz rpy">
+  <link name="${name}">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/multi-purp-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<mesh filename="package://george/meshes/multi-purp-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+  <!-- end multi purpose bracket -->
+  
+  <!-- offset-c bracket macro -->
+  <xacro:macro name="offcbracket" params="name rot">
+  <link name="${name}">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/offset-c-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${rot}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<mesh filename="package://george/meshes/offset-c-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${rot}"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+  <!-- end offset c bracket -->
+  
+  <!-- lconnector macro -->
+  <xacro:macro name="lconnector" params="name rot">
+  <link name="${name}">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/lconnector-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 ${rot}"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<mesh filename="package://george/meshes/lconnector-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 ${rot}"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+  <!-- end lconnector -->
+  
+  
+  <!-- foot macro -->
+  <xacro:macro name="foot" params="name">
+  <link name="${name}">
+    <visual>
+      <geometry>
+	<mesh filename="package://george/meshes/foot.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+	<mesh filename="package://george/meshes/foot.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+  <!-- end foot macro -->
+
+ <!-- tube --> 
+  <xacro:property name="tubelen" value="0.079" />
+  <xacro:property name="tuberad" value="0.006" />
+  
+  <xacro:macro name="tube" params="name">
+    
+  
+    <link name="${name}">
+    <visual>
+      <geometry>
+        <cylinder length="${tubelen}" radius="${tuberad}"/>
+      </geometry>
+      <origin xyz="${tubelen/2} 0 0" rpy="0 ${M_PI/2} 0"/>
+      <material name="white">
+        <color rgba="1 1 1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${tubelen}" radius="${tuberad}"/>
+      </geometry>
+      <origin xyz="${tubelen/2} 0 0" rpy="0 ${M_PI/2} 0"/>
+    </collision>
+      <inertial>
+	<mass value="0.001"/>
+	<xacro:default_inertia/>
+      </inertial>
+  </link>
+  </xacro:macro>
+ <!-- end tube --> 
+  
+  <!-- gripper macro -->
+  <xacro:macro name="gripper" params="name">
+      
+  <link name="${name}_base">
+    <visual>
+      <geometry>
+        <mesh filename="package://george/meshes/gripper-base.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+      <inertial>
+        <mass value="0.001"/>
+        <xacro:default_inertia/>
+      </inertial>
+    
+  </link>
+  
+  <link name="${name}_lfinger">
+    <visual>
+      <geometry>
+        <mesh filename="package://george/meshes/gripper-lfinger.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+      <inertial>
+        <mass value="0.001"/>
+        <xacro:default_inertia/>
+      </inertial>
+    
+  </link>
+  
+  <joint name="${name}_lfinger_to_base" type="prismatic">
+    <axis xyz="0 1 0"/>
+    <parent link="${name}_base"/>
+    <child link="${name}_lfinger"/>
+    <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
+    <limit effort="1000.0" lower="-0.005" upper="0.0137" velocity="0.5"/>
+  </joint>
+  
+  <link name="${name}_rfinger">
+    <visual>
+      <geometry>
+        <mesh filename="package://george/meshes/gripper-rfinger.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+      <inertial>
+        <mass value="0.001"/>
+        <xacro:default_inertia/>
+      </inertial>
+    
+  </link>
+  
+  <joint name="${name}_rfinger_to_base" type="prismatic">
+    <axis xyz="0 1 0"/>
+    <parent link="${name}_base"/>
+    <child link="${name}_rfinger"/>
+    <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
+    <limit effort="1000.0" lower="-0.0137" upper="0.005" velocity="0.5"/>
+  </joint>
+  
+  
+  <xacro:servo_bp prefix="${name}" rot="0" />
+  
+  <joint name="${name}_servo_to_base" type="fixed">
+    <parent link="${name}_base"/>
+    <child link="${name}_servo_body"/>
+    <origin xyz="${0.0365/2 - 0.00825 - 0.0042} 0.0095 ${0.0021 + 0.0197/2}" rpy="${M_PI/2} 0 ${-M_PI/2}"/>
+  </joint>
+  
+  
+  </xacro:macro>
+  <!-- end gripper macro -->
+
+  <!-- low profile axis macro -->
+  <xacro:macro name="lpbracket" params="name mirror">
+  <link name="${name}">
+    <visual>
+      <geometry>
+        <mesh filename="package://george/meshes/low-profile-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0"/>
+      <material name="blue">
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://george/meshes/low-profile-simple.dae" scale="0.0254 0.0254 0.0254"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0"/>
+      <material name="blue">)}
+        <color rgba="0 0 .8 1"/>
+      </material>
+    </collision>
+      <inertial>
+        <mass value="0.001"/>
+        <xacro:default_inertia/>
+      </inertial>
+    
+  </link>
+
+  <xacro:servo_body prefix="${name}_servo" offset="0"/>
+  <joint name="${name}_lp_to_servo" type="fixed">
+    <parent link="${name}"/>
+    <child link="${name}_servo_servo_body"/>
+    <origin xyz="-${0.0497 - 0.010} ${mirror * 0.00825 * 2} ${-(0.0103 - (0.04 / 2))}" rpy="0 ${M_PI/2} ${M_PI/2}"/>
+
+  </joint>
+
+  </xacro:macro>
+  <!-- end low profile axis macro --> 
+ 
+  
+  <!-- *********************************************************** -->
+  <!-- ****************************** Main robot definition ***************** -->
+  <!-- *********************************************************** -->
+  
+  
+  <!-- *********************************************************** -->
+  <!-- ********* Left Leg **************************************** -->
+  <!-- *********************************************************** -->
+  
+  
+  <xacro:servo_bp prefix="LWaist" rot="${M_PI/2}" />
+  
+  <joint name="torso_to_lwaist" type="fixed">
+    <parent link="base_link"/>
+    <child link="LWaist_servo_body"/>
+    <origin xyz="0.032 0.005 0.03" rpy="${M_PI/2} ${M_PI/2} 0"/>
+  </joint>
+  
+  <xacro:cbracket_e name="lthigh1" /> 
+  
+  <joint name="lthigh1_to_lwaist" type="fixed">
+    <parent link="LWaist_servo_horn"/>
+    <child link="lthigh1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_a name="lthigh2" rot="${M_PI/2}"/>
+  <joint name="lthigh1_to_lthigh2" type="fixed">
+    <parent link="lthigh1"/>
+    <child link="lthigh2"/>
+    <origin xyz="-0.0054 -0.0286 ${-0.0246-0.0083}" rpy="-${M_PI/2} 0 0"/> 
+  </joint>
+  
+  <xacro:servo_bp prefix="LHip" rot="${M_PI}" />
+  
+  <joint name="lthigh2_to_LHip" type="fixed">
+    <parent link="lthigh2"/>
+    <child link="LHip_servo_body"/>
+    <origin xyz="${0.0134+.001} 0 -0.0142" rpy="-${M_PI/2} 0 -${M_PI/2}"/>
+  </joint>
+  
+  <xacro:cbracket_e name="lthigh3" /> 
+  
+  <joint name="lthigh3_to_lhip" type="fixed">
+    <parent link="LHip_servo_horn"/>
+    <child link="lthigh3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:cbracket_s name="lthigh4" /> 
+  
+  <joint name="lthigh3_to_lthigh4" type="fixed">
+    <parent link="lthigh3"/>
+    <child link="lthigh4"/>
+    <origin xyz="0 -0.0286 -0.0246" rpy="-${M_PI/2} ${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="LKnee" rot="${M_PI/2}"/>
+  
+  <joint name="lthigh4_to_lknee" type="fixed">
+    <parent link="lthigh4"/>
+    <child link="LKnee_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_c name="lknee1"/>
+  
+  <joint name="lknee_to_lknee1" type="fixed">
+    <parent link="LKnee_servo_body"/>
+    <child link="lknee1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:cbracket_s name="lknee2" /> 
+  
+  <joint name="lknee1_to_lknee2" type="fixed">
+    <parent link="lknee1"/>
+    <child link="lknee2"/>
+    <origin xyz="${0.0161-0.0083} 0.0141 ${-0.0134+0.0054}" rpy="${M_PI/2} ${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="LAnkleBend" rot="${-M_PI/2}"/>
+  
+  <joint name="lknee2_to_lanklebend" type="fixed">
+    <parent link="lknee2"/>
+    <child link="LAnkleBend_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="lshin1"/>
+  
+  <joint name="lanklebend_to_lshin1" type="fixed">
+    <parent link="LAnkleBend_servo_body"/>
+    <child link="lshin1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+
+  <xacro:lpbracket name="lpleft" mirror="0"/>
+
+  <joint name="LAnkleRotate" type="revolute">
+    <axis xyz="0 -1 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="lshin1"/>
+    <child link="lpleft"/>
+    <origin xyz="${0.0161-0.0083} -${0.0141+0.014} ${-0.0134+0.0054}" rpy="0 0 0"/> 
+  </joint>
+
+  <xacro:cbracket_s name="lshin2" /> 
+    
+  <joint name="lpleft_to_lshin2" type="fixed">
+    <parent link="lpleft"/>
+    <child link="lshin2"/>
+    <origin xyz="0 0 0" rpy="-${M_PI/2} 0 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="LAnkleTilt" rot="-${M_PI/2}"/>
+  
+  <joint name="lshin2_to_lankletwist" type="fixed">
+    <parent link="lshin2"/>
+    <child link="LAnkleTilt_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="lshin3"/>
+  
+  <joint name="lankletwist_to_lshin3" type="fixed">
+    <parent link="LAnkleTilt_servo_body"/>
+    <child link="lshin3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:foot name="lfoot"/>
+  
+  <joint name="lshin3_to_lfoot" type="fixed">
+    <parent link="lshin3"/>
+    <child link="lfoot"/>
+    <origin xyz="${0.0161} -${0.0141+0.0015} ${0*(-0.0134+0.0054)}" rpy="0 ${M_PI} 0"/> 
+  </joint>
+  <!-- *********************************************************** -->
+  <!-- ***** Right Leg ******************************************* -->
+  <!-- *********************************************************** -->
+  <xacro:servo_bp prefix="RWaist" rot="${M_PI/2}" />
+  
+  <joint name="torso_to_rwaist" type="fixed">
+    <parent link="base_link"/>
+    <child link="RWaist_servo_body"/>
+    <origin xyz="-0.032 0.005 0.03" rpy="${M_PI/2} ${M_PI/2} 0"/>
+  </joint>
+  
+  <xacro:cbracket_e name="rthigh1" /> 
+  
+  <joint name="rthigh1_to_rwaist" type="fixed">
+    <parent link="RWaist_servo_horn"/>
+    <child link="rthigh1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_a name="rthigh2" rot="${M_PI/2}"/>
+  
+  <joint name="rthigh1_to_rthigh2" type="fixed">
+    <parent link="rthigh1"/>
+    <child link="rthigh2"/>
+    <origin xyz="+0.0054 -0.0286 ${-0.0246-0.0083}" rpy="-${M_PI/2} ${M_PI} 0"/> 
+  </joint>
+  
+  <xacro:servo_bp prefix="RHip" rot="0" />
+  
+  <joint name="rthigh2_to_rhip" type="fixed">
+    <parent link="rthigh2"/>
+    <child link="RHip_servo_body"/>
+    <origin xyz="${0.0134+.001} 0 -0.0142" rpy="-${M_PI/2} ${M_PI} -${M_PI/2}"/>
+  </joint>
+  
+  <xacro:cbracket_e name="rthigh3" /> 
+  
+  <joint name="rthigh3_to_rhip" type="fixed">
+    <parent link="RHip_servo_horn"/>
+    <child link="rthigh3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:cbracket_s name="rthigh4" /> 
+  
+  <joint name="rthigh3_to_rthigh4" type="fixed">
+    <parent link="rthigh3"/>
+    <child link="rthigh4"/>
+    <origin xyz="0 -0.0286 -0.0246" rpy="-${M_PI/2} ${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="RKnee" rot="-${M_PI/2}"/>
+  
+  <joint name="rthigh4_to_knee" type="fixed">
+    <parent link="rthigh4"/>
+    <child link="RKnee_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="rknee1"/>
+  
+  <joint name="rknee_to_rknee1" type="fixed">
+    <parent link="RKnee_servo_body"/>
+    <child link="rknee1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:cbracket_s name="rknee2" /> 
+  
+  <joint name="rknee1_to_rknee2" type="fixed">
+    <parent link="rknee1"/>
+    <child link="rknee2"/>
+    <origin xyz="${0.0161-0.0083} -0.0141 ${-0.0134+0.0054}" rpy="${-M_PI/2} ${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="RAnkleBend" rot="${M_PI/2}"/>
+  
+  <joint name="rknee2_to_ranklebend" type="fixed">
+    <parent link="rknee2"/>
+    <child link="RAnkleBend_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_c name="rshin1"/>
+  
+  <joint name="ranklebend_to_rshin1" type="fixed">
+    <parent link="RAnkleBend_servo_body"/>
+    <child link="rshin1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+
+  <xacro:lpbracket name="lpright" mirror="1"/>
+
+  <joint name="RAnkleRotate" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="rshin1"/>
+    <child link="lpright"/>
+    <origin xyz="${0.0161-0.0083} ${+0.0141 + 0.014} ${-0.0134+0.0054}" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:cbracket_s name="rshin2" /> 
+    
+  <joint name="rshin1_to_rshin2" type="fixed">
+    <parent link="lpright"/>
+    <child link="rshin2"/>
+    <origin xyz="0 0.002 0" rpy="${M_PI/2} 0 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="RAnkleTilt" rot="${M_PI/2}"/>
+  
+  <joint name="rshin2_to_RAnkleTilt" type="fixed">
+    <parent link="rshin2"/>
+    <child link="RAnkleTilt_servo_horn"/>
+    <origin xyz="-0.0246 0 -0.0286" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  
+  <xacro:mpbracket_c name="rshin3"/>
+  
+  <joint name="rankletwist_to_rshin3" type="fixed">
+    <parent link="RAnkleTilt_servo_body"/>
+    <child link="rshin3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:foot name="rfoot"/>
+  
+  <joint name="rshin3_to_rfoot" type="fixed">
+    <parent link="rshin3"/>
+    <child link="rfoot"/>
+    <origin xyz="${0.0161} ${0.0141+0.0015} ${0*(-0.0134+0.0054)}" rpy="${M_PI} 0 0"/> 
+  </joint>
+  
+  <!-- *********************************************************** -->
+  <!-- ***** Left Arm  ******************************************* -->
+  <!-- *********************************************************** -->
+  
+  <xacro:servo_bp prefix="LShoulder" rot="0" />
+  
+  <joint name="torso_to_lshoulder" type="fixed">
+    <parent link="base_link"/>
+    <child link="LShoulder_servo_body"/>
+    <origin xyz="0.0380 0.023175 0.071438" rpy="${-M_PI/2} 0 ${-M_PI/2}"/>
+  </joint>
+  
+  <xacro:offcbracket name="lshoulder1" rot="${M_PI}" />
+  
+  <joint name="lshoulder1_to_lshoulder" type="fixed">
+    <parent link="LShoulder_servo_horn"/>
+    <child link="lshoulder1"/>
+    <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}"/>
+  </joint>
+  
+  <xacro:servo_hp prefix="LElbow" rot="0"/>
+  
+  <joint name="lelbow_to_shoulder1" type="fixed">
+    <parent link="lshoulder1"/>
+    <child link="LElbow_servo_horn"/>
+    <origin xyz="-0.0246 -0.0187 0.027" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="lforearm1"/>
+  
+  <joint name="lforearm1_to_lelbow" type="fixed">
+    <parent link="LElbow_servo_body"/>
+    <child link="lforearm1"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_a name="lforearm2" rot="${M_PI/2}"/>
+  
+  <joint name="lforearm2_to_lforearm1" type="fixed">
+    <parent link="lforearm1"/>
+    <child link="lforearm2"/>
+    <origin xyz="${0.0161+0.0083-0.0054} -0.0142 ${-0.0246+0.0083}" rpy="${-M_PI/2} 0 0"/> 
+  </joint>
+  
+  <xacro:servo_bp prefix="LWristTwist" rot="${M_PI}" />
+  
+  <joint name="lwristtwist_to_lforearm2" type="fixed">
+    <parent link="lforearm2"/>
+    <child link="LWristTwist_servo_body"/>
+    <origin xyz="${0.0134+.001} 0 -0.0142" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+  </joint>
+  
+  <xacro:cbracket_s name="lforearm3" /> 
+  
+  <joint name="lforearm3_to_lwristtwist" type="fixed">
+    <parent link="LWristTwist_servo_horn"/>
+    <child link="lforearm3"/>
+    <origin xyz="0 0 0" rpy="${M_PI} 0 0"/> 
+  </joint>
+  
+  <xacro:servo_hp prefix="LWristFlex" rot="0"/>
+  
+  <joint name="lwristflex_to_lforearm3" type="fixed">
+    <parent link="lforearm3"/>
+    <child link="LWristFlex_servo_horn"/>
+    <origin xyz="0.0246 0 -0.0286" rpy="0 ${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="lforearm4"/>
+  
+  <joint name="lwristflex_to_lforearm4" type="fixed">
+    <parent link="LWristFlex_servo_body"/>
+    <child link="lforearm4"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:lconnector name="lforearm5" rot="0"/>
+  
+  <joint name="lforearm4_to_lforearm5" type="fixed">
+    <parent link="lforearm4"/>
+    <child link="lforearm5"/>
+    <origin xyz="${0.0161+0.0083} -0.0121 ${-0.0134+0.0054}" rpy="0 0 0"/> 
+  </joint>
+  
+  <xacro:tube name="ltube"/>
+  
+  <joint name="lforearm5_to_ltube" type="fixed">
+    <parent link="lforearm5"/>
+    <child link="ltube"/>
+    <origin xyz="0.0227 0.013 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <link name="ltip1">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="blue">
+        <color rgba=".1 .1 1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="ltip1_to_ltube" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="ltube"/>
+    <child link="ltip1"/>
+    <origin xyz="0.070 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <link name="ltip2">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="red">
+        <color rgba="1 .1 .1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="ltip1_to_ltip2" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="ltip1"/>
+    <child link="ltip2"/>
+    <origin xyz="0.001 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <link name="ltip3">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="green">
+        <color rgba=".1 1 .1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="ltip2_to_ltip3" type="revolute">
+    <axis xyz="1 0 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="ltip2"/>
+    <child link="ltip3"/>
+    <origin xyz="0.001 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  
+  <!-- *********************************************************** -->
+  <!-- ***** Right Arm  ******************************************* -->
+  <!-- *********************************************************** -->
+  
+  <xacro:servo_bp prefix="RShoulder" rot="0" />
+  
+  <joint name="torso_to_rshoulder" type="fixed">
+    <parent link="base_link"/>
+    <child link="RShoulder_servo_body"/>
+    <origin xyz="-0.0380 0.023175 0.071438" rpy="${M_PI/2} 0 ${-M_PI/2}"/>
+  </joint>
+  
+  <xacro:offcbracket name="rshoulder1" rot="0" />
+  
+  <joint name="rshoulder1_to_rshoulder" type="fixed">
+    <parent link="RShoulder_servo_horn"/>
+    <child link="rshoulder1"/>
+    <origin xyz="0 0 0" rpy="0 0 ${M_PI/2}"/>
+  </joint>
+  
+  <xacro:servo_hp prefix="RElbow" rot="0"/>
+  
+  <joint name="relbow_to_shoulder1" type="fixed">
+    <parent link="rshoulder1"/>
+    <child link="RElbow_servo_horn"/>
+    <origin xyz="-0.0246 0.0187 0.027" rpy="0 -${M_PI/2} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_cr name="rforearm1"/>
+  
+  <joint name="rforearm1_to_relbow" type="fixed">
+    <parent link="RElbow_servo_body"/>
+    <child link="rforearm1"/>
+    <origin xyz="${0.0161*2} 0 0" rpy="${M_PI} ${M_PI} 0"/> 
+  </joint>
+  
+  <xacro:mpbracket_a name="rforearm2" rot="${M_PI/2}"/>
+  
+  <joint name="rforearm2_to_rforearm1" type="fixed">
+    <parent link="rforearm1"/>
+    <child link="rforearm2"/>
+    <origin xyz="${0.0161-0.0083-0.0054} -0.0142 ${-0.0246+0.0083}" rpy="${-M_PI/2} ${M_PI} 0"/> 
+  </joint>
+  
+  <xacro:servo_bp prefix="RWristTwist" rot="0" />
+  
+  <joint name="rwristtwist_to_rforearm2" type="fixed">
+    <parent link="rforearm2"/>
+    <child link="RWristTwist_servo_body"/>
+    <origin xyz="${0.0134+.001} 0 -0.0142" rpy="${M_PI/2} 0 ${M_PI/2}"/>
+  </joint>
+  
+  <xacro:gripper name="gripper" />
+  
+  <joint name="gripper_to_wrist" type="fixed">
+    <parent link="RWristTwist_servo_horn"/>
+    <child link="gripper_base"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <link name="rtip1">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="blue">
+        <color rgba=".1 .1 1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="RHand" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="gripper_base"/>
+    <child link="rtip1"/>
+    <origin xyz="0 0 0.070" rpy="0 ${M_PI/2} 0"/> 
+  </joint>
+  
+  <link name="rtip2">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="red">
+        <color rgba="1 .1 .1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="rtip1_to_rtip2" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="rtip1"/>
+    <child link="rtip2"/>
+    <origin xyz="-0.001 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  <link name="rtip3">
+    <visual>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="green">
+        <color rgba=".1 1 .1 1"/>
+      </material>
+    </visual>
+  </link>
+  
+  <joint name="rtip2_to_rtip3" type="revolute">
+    <axis xyz="1 0 0"/>
+    <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
+    <parent link="rtip2"/>
+    <child link="rtip3"/>
+    <origin xyz="-0.001 0 0" rpy="0 0 0"/> 
+  </joint>
+  
+  
+  <!-- *********************************************************** -->
+  <!-- ***** head      ******************************************* -->
+  <!-- *********************************************************** -->
+  
+  <xacro:servo_bp prefix="Head" rot="0" />
+  
+  <joint name="torso_to_head" type="fixed">
+    <parent link="base_link"/>
+    <child link="Head_servo_body"/>
+    <origin xyz="0 0.023175 0.087313" rpy="0 0 ${-M_PI/2}"/>
+  </joint>
+
+
+<!--   ['RWaist', 'RHip', 'RKnee', 'RAnkleBend', 'RAnkleRotate', 'RAnkleTilt', 
+        'LWaist', 'LHip', 'LKnee', 'LAnkleBend', 'LAnkleRotate', 'LAnkleTilt', 
+        'LShoulder', 'LElbow', 'LWristTwist', 'LWristFlex', 
+        'RShoulder', 'RElbow', 'RWristTwist', 'RHand', 'Head']
+-->
+  <!-- *********************************************************** -->
+  <!-- *** Gazebo sim stuff ************************************** -->
+  <!-- *********************************************************** -->
+
+  <transmission name="tran0">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RWaist"/>
+    <actuator name="motor0">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RHip"/>
+    <actuator name="motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RKnee"/>
+    <actuator name="motor2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RAnkleBend"/>
+    <actuator name="motor3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran4">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RAnkleRotate"/>
+    <actuator name="motor4">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran5">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RAnkleTilt"/>
+    <actuator name="motor5">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+    <transmission name="tran6">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LWaist"/>
+    <actuator name="motor6">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="tran7">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LHip"/>
+    <actuator name="motor7">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran8">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LKnee"/>
+    <actuator name="motor8">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran9">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LAnkleBend"/>
+    <actuator name="motor9">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran10">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LAnkleRotate"/>
+    <actuator name="motor10">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran11">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LAnkleTilt"/>
+    <actuator name="motor11">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+
+</robot>
