@@ -27,6 +27,8 @@ class msgHandler():
         self.pwm2 = pwm2
         self.jsPub = rospy.Publisher( "joint_states" + str(self.an), JointState )
         print "msgHandler got robot description: %s " % str(self.robot_description)
+        self.positions = [0.5] * self.robot_description.appendages[self.an].nservos
+
     def cmd_callback(self, val):
         rospy.logdebug( "-D- in servoHandler servo_callback appendage_no %d val:%s" % (self.an, str(val) ) )
         # import pdb; pdb.set_trace()
@@ -37,6 +39,7 @@ class msgHandler():
             js.name.append( self.robot_description.appendages[self.an].jointnames[i])
             # print "val.joints = %d" % val.joints[i]
             js.position.append( val.joints[i] * 1.0)
+            self.positions[i] = val.joints[i] * 1.0 / 180.0
             js.velocity.append( 0.0 )
             js.effort.append( 0.0 )
             
@@ -85,6 +88,8 @@ class messageHandler():
             self.command_sub.append( rospy.Subscriber( "command"+str(i), Appendage_state, s.cmd_callback ) )
             self.servo_handlers.append( s )
             
+        self.full_js_pub = rospy.Publisher("joint_states", JointState)    
+
     def servo_setup(self):
         self.pwm = PWM(0x40, debug=True)
         self.pwm2 = PWM(0x41, debug=True)
@@ -95,11 +100,27 @@ class messageHandler():
         self.servoMin = 150  # Min pulse length out of 4096
         self.servoMax = 600  # Max pulse length out of 4096
         
+    def full_joint_cmd_publish(self):
 
+    def full_jointstate_publish(self):
+        js = JointState() 
+        for i in range( self.robot_description.NAppendages ):
+            njoints = self.robot_description.appendages[i].nservos
+            for j in range( njoints ):
+                js.name.append( self.robot_description.appendages[i].jointnames[j])
+                # print "val.joints = %d" % val.joints[i]
+                js.position.append( self.servo_handlers[i].positions[j] ) 
+            js.velocity.append( 0.0 )
+            js.effort.append( 0.0 )
+            js.header.frame_id = "base_link"
+            js.header.stamp = rospy.Time.now()
+            
+        self.full_js_pub.publish( js )
             
     def spin(self):
         while not(rospy.is_shutdown()):
-            rospy.sleep(0.01)
+            rospy.sleep(0.05)
+            self.full_jointstate_publish();
             
 ##################################################################################################################
 # main
