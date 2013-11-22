@@ -1,6 +1,15 @@
 <launch>
 	<include file="$(find george)/launch/biped_appendages.launch" />
-	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen"/>
+	<node pkg="rqt_gui" type="rqt_gui" name="rqt_gui" output="screen">
+		<remap from="command0" to="/joint0_position_controller/joint_cmd" /> 
+		<remap from="command1" to="/joint1_position_controller/joint_cmd" /> 
+		<remap from="command2" to="/joint2_position_controller/joint_cmd" /> 
+		<remap from="command3" to="/joint3_position_controller/joint_cmd" /> 
+		<remap from="joint_states0" to="/joint0_position_controller/joint_states" />
+		<remap from="joint_states1" to="/joint1_position_controller/joint_states" />
+		<remap from="joint_states2" to="/joint2_position_controller/joint_states" />
+		<remap from="joint_states3" to="/joint3_position_controller/joint_states" />
+	</node>
 	<node pkg="george" type="home.py" name="home" output="screen"/>
 	<node pkg="george" type="stop.py" name="stop" output="screen"/>
     <param name="robot_description" textfile="$(find george)/urdf/george.urdf" />

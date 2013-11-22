@@ -53,3 +53,40 @@ george:
     type: effort_controllers/JointPositionController
     joint: LAnkleTilt
     pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint12_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LShoulder
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint13_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LElbow
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint14_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LWristTwist
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint15_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: LWristFlex
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+    
+  joint16_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RShoulder
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint17_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RElbow
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint18_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: RWristTwist
+    pid: {p: 100.0, i: 0.01, d: 0.01}
+#  joint19_position_controller:
+#    type: effort_controllers/JointPositionController
+#    joint: RHand
+#    pid: {p: 100.0, i: 0.01, d: 0.01}
+  joint20_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: Head
+    pid: {p: 100.0, i: 0.01, d: 0.01}

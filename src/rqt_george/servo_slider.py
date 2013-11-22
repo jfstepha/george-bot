@@ -126,8 +126,8 @@ class sliderPanel(QtGui.QWidget):
         self.panelLayout = QtGui.QGridLayout()
         self.setLayout(self.panelLayout)
         self.slider = QtGui.QSlider( QtCore.Qt.Horizontal )
-        self.slider.setMaximum(180)
         self.slider.setMinimum(0)
+        self.slider.setMaximum(180)
         self.slider.setValue(90)
         self.slider.setMinimumSize(100,10)
         self.slider.setMinimumSize(100,10)
@@ -157,8 +157,9 @@ class sliderPanel(QtGui.QWidget):
             self.caller_change_callback(self.index, value)
             self.last_changed = rospy.Time.now()
     def set_progressbar(self, value):
-        rospy.logdebug("set_progressbar %s (%d) to %0.3f" % (self.name, self.index, value))
-        self.c.pbar_val.emit(value)
+        v2 = (value  + 3.1416 / 2.0) / 3.1416 * 180.0
+        rospy.loginfo("set_progressbar %s (%d) to %0.3f (original=%0.3f)" % (self.name, self.index, v2, value))
+        self.c.pbar_val.emit(v2)
 
         
 
@@ -251,12 +252,12 @@ class SliderPlugin(Plugin):
         
         self.joint_state_sub = rospy.Subscriber("joint_states" + str(self.appendage_no), JointState, self.joint_states_callback, None, 1)
         self.joint_state_msg = Appendage_state()
-        self.joint_state_msg.joints = [90] * 6
+        self.joint_state_msg.joints = [0] * 6
         self.joint_state_msg.speed = 1
 
     def slider_changed_callback(self, slider_no, value):
         rospy.logdebug( "Slider changed callback, slider %d value: %d" % (slider_no, value))
-        self.command_msg.joints[slider_no] = value
+        self.command_msg.joints[slider_no] = (value / 180.0) * 3.1416 - 3.1416 / 2 
         # self.command_publish()
         
     def command_publish(self, docheck=True):

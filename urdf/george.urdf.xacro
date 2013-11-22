@@ -12,7 +12,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-	<mesh filename="package://george/meshes/torso_mm.dae" scale="0.0254 0.0254 0.0254"/>
+	<mesh filename="package://george/meshes/torso_mm.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI}"/>
       <material name="blue">
@@ -21,9 +21,9 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://george/meshes/torso_mm.dae" scale="0.0254 0.0254 0.0254"/>
+	      <box size=".040 .02 .0365"/>
       </geometry>
-      <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${M_PI}"/>
+      <origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
     </collision> 
 <!--       <inertial>
 	<mass value="0.001"/>
@@ -162,7 +162,7 @@
   <link name="${name}">
     <visual>
       <geometry>
-	<mesh filename="package://george/meshes/cbracket-simple.dae" scale="0.0254 0.0254 0.0254"/>
+	<mesh filename="package://george/meshes/cbracket-simple.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <material name="blue">
@@ -171,7 +171,8 @@
     </visual>
     <collision>
       <geometry>
-	<mesh filename="package://george/meshes/cbracket-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <box size=".005 .005 .005"/>
+	<!--  mesh filename="package://george/meshes/cbracket-simple.dae" scale="1 1 1"/-->
       </geometry>
       <origin xyz="${xyz}" rpy="${rpy}"/>
     </collision>
@@ -209,7 +210,7 @@
   <link name="${name}">
     <visual>
       <geometry>
-	<mesh filename="package://george/meshes/multi-purp-simple.dae" scale="0.0254 0.0254 0.0254"/>
+	<mesh filename="package://george/meshes/multi-purp-simple.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="${xyz}" rpy="${rpy}"/>
       <material name="blue">
@@ -218,7 +219,8 @@
     </visual>
     <collision>
       <geometry>
-	<mesh filename="package://george/meshes/multi-purp-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <box size=".005 .005 .005"/>
+	<!--  mesh filename="package://george/meshes/multi-purp-simple.dae" scale="1 1 1"/-->
       </geometry>
       <origin xyz="${xyz}" rpy="${rpy}"/>
     </collision>
@@ -235,7 +237,7 @@
   <link name="${name}">
     <visual>
       <geometry>
-	<mesh filename="package://george/meshes/offset-c-simple.dae" scale="0.0254 0.0254 0.0254"/>
+	<mesh filename="package://george/meshes/offset-c-simple.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${rot}"/>
       <material name="blue">
@@ -244,7 +246,8 @@
     </visual>
     <collision>
       <geometry>
-	<mesh filename="package://george/meshes/offset-c-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <box size=".005 .005 .005"/>
+	<!-- mesh filename="package://george/meshes/offset-c-simple.dae" scale="1 1 1"/-->
       </geometry>
       <origin xyz="0 0 0" rpy="${M_PI/2} 0 ${rot}"/>
     </collision>
@@ -261,7 +264,7 @@
   <link name="${name}">
     <visual>
       <geometry>
-	<mesh filename="package://george/meshes/lconnector-simple.dae" scale="0.0254 0.0254 0.0254"/>
+	<mesh filename="package://george/meshes/lconnector-simple.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 ${rot}"/>
       <material name="blue">
@@ -270,7 +273,8 @@
     </visual>
     <collision>
       <geometry>
-	<mesh filename="package://george/meshes/lconnector-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <box size=".005 .005 .005"/>
+	<!--  mesh filename="package://george/meshes/lconnector-simple.dae" scale="1 1 1"/-->
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 ${rot}"/>
     </collision>
@@ -297,7 +301,7 @@
     </visual>
     <collision>
       <geometry>
-	<mesh filename="package://george/meshes/foot.dae"/>
+        <box size="0.065 0.002 0.15"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
     </collision>
@@ -346,13 +350,18 @@
   <link name="${name}_base">
     <visual>
       <geometry>
-        <mesh filename="package://george/meshes/gripper-base.dae" scale="0.0254 0.0254 0.0254"/>
+        <mesh filename="package://george/meshes/gripper-base.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 ${-M_PI/2} 0"/>
       <material name="blue">
         <color rgba="0 0 .8 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+    </collision>
       <inertial>
         <mass value="0.001"/>
         <xacro:default_inertia/>
@@ -363,13 +372,18 @@
   <link name="${name}_lfinger">
     <visual>
       <geometry>
-        <mesh filename="package://george/meshes/gripper-lfinger.dae" scale="0.0254 0.0254 0.0254"/>
+        <mesh filename="package://george/meshes/gripper-lfinger.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <material name="blue">
         <color rgba="0 0 .8 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+    </collision>
       <inertial>
         <mass value="0.001"/>
         <xacro:default_inertia/>
@@ -388,13 +402,18 @@
   <link name="${name}_rfinger">
     <visual>
       <geometry>
-        <mesh filename="package://george/meshes/gripper-rfinger.dae" scale="0.0254 0.0254 0.0254"/>
+        <mesh filename="package://george/meshes/gripper-rfinger.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <material name="blue">
         <color rgba="0 0 .8 1"/>
       </material>
     </visual>
+    <collision>
+      <geometry>
+        <box size=".005 .005 .005"/>
+      </geometry>
+    </collision>
       <inertial>
         <mass value="0.001"/>
         <xacro:default_inertia/>
@@ -428,7 +447,7 @@
   <link name="${name}">
     <visual>
       <geometry>
-        <mesh filename="package://george/meshes/low-profile-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <mesh filename="package://george/meshes/low-profile-simple.dae" scale="1 1 1"/>
       </geometry>
       <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0"/>
       <material name="blue">
@@ -437,7 +456,8 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://george/meshes/low-profile-simple.dae" scale="0.0254 0.0254 0.0254"/>
+        <box size=".005 .005 .005"/>
+        <!--  mesh filename="package://george/meshes/low-profile-simple.dae" scale="1 1 1"/-->
       </geometry>
       <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0"/>
       <material name="blue">)}
@@ -1138,6 +1158,89 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
+
+  <transmission name="tran12">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LShoulder"/>
+    <actuator name="motor12">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran13">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LElbow"/>
+    <actuator name="motor13">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran14">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LWristTwist" />
+    <actuator name="motor14">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran15">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="LWristFlex" />
+    <actuator name="motor15">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  
+  <transmission name="tran16">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RShoulder"/>
+    <actuator name="motor16">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran17">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RElbow"/>
+    <actuator name="motor17">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran18">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RWristTwist" />
+    <actuator name="motor18">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <!--  transmission name="tran19">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="RHand" />
+    <actuator name="motor19">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission-->
+
+  <transmission name="tran20">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="Head" />
+    <actuator name="motor20">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
   
 
 </robot>

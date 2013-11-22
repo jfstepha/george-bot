@@ -2,5 +2,15 @@
     <machine name="robot" address="$(env ROBOT)" env-loader="$(env ENV_LOADER)" user="jfstepha" timeout="240"/>
     <!-- see http://www.ros.org/wiki/roslaunch/XML/machine -->
 	<include file="$(find george)/launch/rqt_george_noser.launch" />
-	<node machine="robot" pkg="george" type="serial_node.py" name="serial_node" output="screen"/>
+	<node machine="robot" pkg="george" type="serial_node.py" name="serial_node" output="screen">
+		<remap from="command0" to="/joint0_position_controller/joint_cmd" /> 
+		<remap from="command1" to="/joint1_position_controller/joint_cmd" /> 
+		<remap from="command2" to="/joint2_position_controller/joint_cmd" /> 
+		<remap from="command3" to="/joint3_position_controller/joint_cmd" /> 
+		<remap from="joint_states0" to="/joint0_position_controller/joint_states" />
+		<remap from="joint_states1" to="/joint1_position_controller/joint_states" />
+		<remap from="joint_states2" to="/joint2_position_controller/joint_states" />
+		<remap from="joint_states3" to="/joint3_position_controller/joint_states" />
+	</node>
+
 </launch>
