@@ -245,7 +245,7 @@ class SliderPlugin(Plugin):
         robot_description.ReadParameters()
         self.command_pub = rospy.Publisher("command" + str(self.appendage_no), Appendage_state)
         self.command_msg = Appendage_state()
-        self.command_msg.joints = [90] * 6
+        self.command_msg.joints = [0] * 6
         self.command_msg.speed = 1
         
         self.macro_cmd_sub = rospy.Subscriber("macro_cmd", String, self.macro_cmd_callback, None, 100)
