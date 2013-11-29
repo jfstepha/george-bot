@@ -1,0 +1,2 @@
+uint8[6] joints
+float32 speed

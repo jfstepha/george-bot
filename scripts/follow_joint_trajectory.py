@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 
-import roslib; roslib.load_manifest('george_moveit')
+import roslib; roslib.load_manifest('george')
 import rospy
 import actionlib
 from sensor_msgs.msg import JointState
 from george.msg import Appendage_state
 
-import george_moveit.msg
+import george.msg
 ###################################################################### 
 ###################################################################### 
 class FollowJointAction():
@@ -21,7 +21,7 @@ class FollowJointAction():
 ###################################################################### 
         self._action_name = name
         rospy.loginfo("FollowJointAction %s started" % name)
-        self._as = actionlib.SimpleActionServer('follow_joint_trajectory', george_moveit.msg.FollowJointTrajectoryAction, self.execute, False)
+        self._as = actionlib.SimpleActionServer('follow_joint_trajectory', george.msg.FollowJointTrajectoryAction, self.execute, False)
         self._as.start()
 
         self.command_pub = rospy.Publisher("joint_cmd", Appendage_state)

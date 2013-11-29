@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
 )
+find_package(catkin REQUIRED genmsg actionlib_msgs trajectory_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -59,18 +60,10 @@ catkin_python_setup()
    Stop.srv
  )
 
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+add_action_files(DIRECTORY action FILES FollowJointTrajectory.action)
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-)
+generate_messages(DEPENDENCIES actionlib_msgs trajectory_msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -129,6 +122,11 @@ install(PROGRAMS
    scripts/home.py
    scripts/stop.py
    scripts/serial_node.py
+   scripts/follow_joint_trajectory_head.py
+   scripts/follow_joint_trajectory_larm.py
+   scripts/follow_joint_trajectory_lleg.py
+   scripts/follow_joint_trajectory_rarm.py
+   scripts/follow_joint_trajectory_rleg.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

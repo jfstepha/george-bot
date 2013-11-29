@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import roslib; roslib.load_manifest('george_moveit')
+import roslib; roslib.load_manifest('george')
 import rospy
 import actionlib
 import follow_joint_trajectory
