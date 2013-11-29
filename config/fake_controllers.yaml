@@ -1,0 +1,90 @@
+controller_list:
+  - name: fake_LArm_controller
+    joints:
+      - LShoulder
+      - LElbow
+      - LWristTwist
+      - LWristFlex
+      - ltip1_to_ltube
+      - ltip1_to_ltip2
+      - ltip2_to_ltip3
+  - name: fake_RArm_controller
+    joints:
+      - RShoulder
+      - RElbow
+      - RWristTwist
+      - RHand
+      - rtip1_to_rtip2
+      - rtip2_to_rtip3
+  - name: fake_LLeg_controller
+    joints:
+      - LWaist
+      - LHip
+      - LKnee
+      - LAnkleBend
+      - LAnkleRotate
+      - LAnkleTilt
+  - name: fake_RLeg_controller
+    joints:
+      - RWaist
+      - RHip
+      - RKnee
+      - RAnkleBend
+      - RAnkleRotate
+      - RAnkleTilt
+  - name: fake_arms_controller
+    joints:
+      - LShoulder
+      - LElbow
+      - LWristTwist
+      - LWristFlex
+      - ltip1_to_ltube
+      - ltip1_to_ltip2
+      - ltip2_to_ltip3
+      - RShoulder
+      - RElbow
+      - RWristTwist
+      - RHand
+      - rtip1_to_rtip2
+      - rtip2_to_rtip3
+  - name: fake_legs_controller
+    joints:
+      - LWaist
+      - LHip
+      - LKnee
+      - LAnkleBend
+      - LAnkleRotate
+      - LAnkleTilt
+      - RWaist
+      - RHip
+      - RKnee
+      - RAnkleBend
+      - RAnkleRotate
+      - RAnkleTilt
+  - name: fake_limbs_controller
+    joints:
+      - LShoulder
+      - LElbow
+      - LWristTwist
+      - LWristFlex
+      - ltip1_to_ltube
+      - ltip1_to_ltip2
+      - ltip2_to_ltip3
+      - LWaist
+      - LHip
+      - LKnee
+      - LAnkleBend
+      - LAnkleRotate
+      - LAnkleTilt
+      - RShoulder
+      - RElbow
+      - RWristTwist
+      - RHand
+      - rtip1_to_rtip2
+      - rtip2_to_rtip3
+      - RWaist
+      - RHip
+      - RKnee
+      - RAnkleBend
+      - RAnkleRotate
+      - RAnkleTilt

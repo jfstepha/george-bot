@@ -1,0 +1,41 @@
+controller_list:
+  - name: joint0_position_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - RWaist
+      - RHip
+      - RKnee
+      - RAnkleBend
+      - RAnkleRotate
+      - RAnkleTilt
+  - name: joint1_position_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - LWaist
+      - LHip
+      - LKnee
+      - LAnkleBend
+      - LAnkleRotate
+      - LAnkleTilt
+  - name: joint2_position_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    joints:
+      - LShoulder
+      - LElbow
+      - LWristTwist
+      - LWristFlex
+      - ltip1_to_ltube
+      - ltip1_to_ltip2
+      - ltip2_to_ltip3
+  - name: joint3_position_controller
+    type: FollowJointTrajectory
+    action_ns: follow_joint_trajectory
+    joints:
+      - RShoulder
+      - RElbow
+      - RWristTwist
+      - RHand
+      - rtip1_to_rtip2
