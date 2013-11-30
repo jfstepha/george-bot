@@ -1,4 +1,31 @@
 <library path="src">
+  <class name="GeorgeCommander" type="rqt_george.biped_commander.CmdrPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      An example Python GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <label>George Commander</label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class>
+  <!--class name="GeorgeCommander" type="rqt_george.biped_commander.CmdrPlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Overall robot control
+    </description>
+    <qtgui>
+      <group>
+        <label>George</label>
+      </group>
+      <label>George Commander>/label>
+      <icon type="theme">system-help</icon>
+      <statustip>George plugin</statustip>
+    </qtgui>
+  </class-->
+  
   <class name="RArmPlugin" type="rqt_george.servo_slider.RArmSliderPlugin" base_class_type="rqt_gui_py::Plugin">
     <description>
       An example Python GUI plugin to create a great user interface.

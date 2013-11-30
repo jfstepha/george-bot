@@ -282,6 +282,22 @@ class SliderPlugin(Plugin):
         return( retval )
         
     def macro_cmd_callback(self, msg):
+        if msg.data == "home":
+            print "Received home macro command"
+            self.command_msg.joints = [0] * 6
+            self.command_publish(False)
+            for i in range( self.npanels ):
+                self.panels[i].slider.setValue( 90 )
+        elif msg.data == "send":
+            print "Received send macro command"
+            self.command_pub.publish( self.command_msg )
+        elif msg.data == "copy":
+            print "Received send macro command"
+            self.copy_states()
+        elif msg.data == "auto_on":
+            self.button_panel.auto_button.setChecked(True)
+        elif msg.data == "auto_off":
+            self.button_panel.auto_button.setChecked(False)
         pass
     
     def joint_states_callback(self, msg):

@@ -21,19 +21,111 @@ class Communicate(QtCore.QObject):
 ##########################################################################
 ##########################################################################
     pbar_val = QtCore.Signal(int)
-
+    
 ##########################################################################
 ##########################################################################
-class CmdrPanel(QtGui.QWidget):
+class ButtonPanel(QtGui.QWidget):
 ##########################################################################
 ##########################################################################
-    def __init__(self, name, index, caller_change_callback):
-        self.c = Communicate()
+    def __init__(self, parent):
+        
         QtGui.QWidget.__init__(self)
+        self.init_ros_params()
+        self.parent = parent
+        btnw = 40
+        btnh = 20
+        
         self.panelLayout = QtGui.QGridLayout()
         self.setLayout(self.panelLayout)
-        self.lblName = QtGui.QLabel( "Panel" )
-        self.panelLayout.addWidget(self.lblName,0,0)
+        
+        self.home_button = QtGui.QPushButton()
+        self.home_button.setText('Home')
+        self.home_button.clicked.connect( self.on_home_button_clicked )
+        self.home_button.setMinimumSize(btnw,btnh)
+
+        self.send_button = QtGui.QPushButton()
+        self.send_button.setText('Send')
+        self.send_button.clicked.connect( self.on_send_button_clicked )
+        self.send_button.setMinimumSize(btnw,btnh)
+
+        self.copy_button = QtGui.QPushButton()
+        self.copy_button.setText('Copy positions')
+        self.copy_button.clicked.connect( self.on_copy_button_clicked )
+        self.copy_button.setMinimumSize(btnw,btnh)
+
+        self.auto_button = QtGui.QPushButton()
+        self.auto_button.setText('Auto send')
+        self.auto_button.clicked.connect( self.on_auto_button_clicked )
+        self.auto_button.setMinimumSize(btnw,btnh)
+        self.auto_button.setCheckable(True)
+
+        self.settrim_button = QtGui.QPushButton()
+        self.settrim_button.setText('Set Trim')
+        self.settrim_button.clicked.connect( self.on_settrim_button_clicked )
+        self.settrim_button.setMinimumSize(btnw,btnh)
+
+        self.printtrim_button = QtGui.QPushButton()
+        self.printtrim_button.setText('Print Trim')
+        self.printtrim_button.clicked.connect( self.on_printtrim_button_clicked )
+        self.printtrim_button.setMinimumSize(btnw,btnh)
+
+        self.savetrim_button = QtGui.QPushButton()
+        self.savetrim_button.setText('Save Trim')
+        self.savetrim_button.clicked.connect( self.on_savetrim_button_clicked )
+        self.savetrim_button.setMinimumSize(btnw,btnh)
+  
+        self.loadtrim_button = QtGui.QPushButton()
+        self.loadtrim_button.setText('Load Trim')
+        self.loadtrim_button.clicked.connect( self.on_loadtrim_button_clicked )
+        self.loadtrim_button.setMinimumSize(btnw,btnh)
+  
+        self.panelLayout.addWidget(self.home_button,0,0)
+        self.panelLayout.addWidget(self.copy_button,0,1)
+        self.panelLayout.addWidget(self.send_button,0,2)
+        self.panelLayout.addWidget(self.auto_button,0,3)
+        self.panelLayout.addWidget(self.settrim_button,1,0)
+        self.panelLayout.addWidget(self.printtrim_button,1,1)
+        self.panelLayout.addWidget(self.savetrim_button,1,2)
+        self.panelLayout.addWidget(self.loadtrim_button,1,3)
+        
+    def init_ros_params(self): 
+        robot_description.ReadParameters()
+        self.macro_cmd_pub = rospy.Publisher("macro_cmd", String)
+         
+    def on_home_button_clicked(self):
+        rospy.logdebug("home_button_clicked")
+        self.macro_cmd_pub.publish("home")
+
+    def on_send_button_clicked(self):
+        rospy.logdebug("send_button_clicked")
+        self.macro_cmd_pub.publish("send")
+
+    def on_copy_button_clicked(self):
+        rospy.logdebug("copy_button_clicked")
+        self.macro_cmd_pub.publish("copy")
+
+    def on_auto_button_clicked(self):
+        rospy.logdebug("auto_button_clicked")
+        if self.auto_button.isChecked() == True:
+            self.macro_cmd_pub.publish("auto_on")
+        else:
+            self.macro_cmd_pub.publish("auto_off")
+            
+    def on_printtrim_button_clicked(self):
+        rospy.logdebug("print trim button clicked")
+        self.macro_cmd_pub.publish("print_trim")
+
+    def on_settrim_button_clicked(self):
+        rospy.logdebug("set trim button clicked")
+        self.macro_cmd_pub.publish("set_trim")
+
+    def on_savetrim_button_clicked(self):
+        rospy.logdebug("save trim button clicked")
+        self.macro_cmd_pub.publish("save_trim")
+
+    def on_loadtrim_button_clicked(self):
+        rospy.logdebug("load trim button clicked")
+        self.macro_cmd_pub.publish("load_trim")
         
 
 ##########################################################################
@@ -43,12 +135,11 @@ class CmdrPlugin(Plugin):
 ##########################################################################
 
     def __init__(self, context):
-        self.init_ros_params()
         # robot_description.Print()
 
-        super(SliderPlugin, self).__init__(context)
+        super(CmdrPlugin, self).__init__(context)
         # Give QObjects reasonable names
-        self.setObjectName(self.formname)
+        #self.setObjectName(self.formname)
 
 
         # Process standalone plugin command-line arguments
@@ -66,10 +157,7 @@ class CmdrPlugin(Plugin):
         self.mainLayout = QtGui.QVBoxLayout( )
 
         # Create the panels
-        self.main_panel = CmdrPanel( )
-            self.mainLayout.addWidget( self.panels[ i ] )
-            
-        self.button_panel = buttonPanel(self)
+        self.button_panel = ButtonPanel(self)
         self.mainLayout.addWidget( self.button_panel )
 
         # central widget
@@ -80,8 +168,8 @@ class CmdrPlugin(Plugin):
         # set central widget
         
         # Give QObjects reasonable names
-        self.form1.setObjectName(self.formname)
-        self.form1.setWindowTitle( self.formname )
+        self.form1.setObjectName("George Commander")
+        self.form1.setWindowTitle( "George Commander" )
         # Show _widget.windowTitle on left-top of each plugin (when 
         # it's set in _widget). This is useful when you open multiple 
         # plugins at once. Also if you open multiple instances of your 
@@ -105,64 +193,10 @@ class CmdrPlugin(Plugin):
         #self.c.slider1.connect( self.panel1.slider.setValue )
         #self.panel1.slider.valueChanged.connect( self.on_slider1_changed )
 
-    def init_ros_params(self):
-        robot_description.ReadParameters()
-        self.command_pub = rospy.Publisher("command" + str(self.appendage_no), Appendage_state)
-        self.command_msg = Appendage_state()
-        self.command_msg.joints = [90] * 6
-        self.command_msg.speed = 1
         
-        self.macro_cmd_sub = rospy.Subscriber("macro_cmd", String, self.macro_cmd_callback, None, 100)
         
-        self.joint_state_sub = rospy.Subscriber("joint_states" + str(self.appendage_no), JointState, self.joint_states_callback, None, 1)
-        self.joint_state_msg = Appendage_state()
-        self.joint_state_msg.joints = [90] * 6
-        self.joint_state_msg.speed = 1
-
-    def slider_changed_callback(self, slider_no, value):
-        rospy.logdebug( "Slider changed callback, slider %d value: %d" % (slider_no, value))
-        self.command_msg.joints[slider_no] = value
-        # self.command_publish()
-        
-    def command_publish(self, docheck=True):
-        rospy.logdebug("publishing command message for appendage " + str(self.appendage_no) )
-        if docheck == False or self.is_changed( self.command_msg ):
-            self.command_pub.publish( self.command_msg )
-        
-    def is_changed(self, cmd_msg):
-        retval = False
-
-        if len( self.prev_cmd_joints ) == len( cmd_msg.joints ):
-            for i in range( len( cmd_msg.joints ) ) :
-                if self.prev_cmd_joints[i] != cmd_msg.joints[i]:
-                    retval = True
-                    self.prev_cmd_joints[i] = cmd_msg.joints[i]
-        else:
-            # prev_cmd has not been initialized
-            self.prev_cmd_joints = []
-            for i in range( len( cmd_msg.joints ) ) :
-                self.prev_cmd_joints.append(cmd_msg.joints[i])
-            retval = True
-        return( retval )
-        
-    def macro_cmd_callback(self, msg):
-        pass
-    
-    def joint_states_callback(self, msg):
-        rospy.logdebug( "joint_states_callback msg: %s " % msg)
-        for i in range( len( msg.position ) ):
-            self.panels[i].set_progressbar(msg.position[i])
-            
-    def copy_states(self):
-        rospy.logdebug( "-D- in copy_states")
-        for i in range( self.npanels ):
-            self.panels[i].slider.setValue( self.panels[i].prog.value() )
-            
     def on_timer_update(self):
-       #rospy.logdebug( "-D- tick")
-        if self.button_panel.auto_button.isChecked():
-            rospy.logdebug("publishing")
-            self.command_publish( )
+       rospy.logdebug( "-D- tick")
     
     def shutdown_plugin(self):
         # TODO unregister all publishers here
