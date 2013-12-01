@@ -14,10 +14,7 @@ from robotDescription import *
 path = os.path.dirname(__file__) + "/../src/"
 sys.path.append(path)
 
-DOSERVO = os.environ.get('ROS_GEORGE_DOSERVO') == 'True'
 
-if DOSERVO:
-    from Adafruit_PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
 import time
 
 ##################################################################################################################
@@ -26,11 +23,12 @@ class msgHandler():
     ''' handles the messages for each appendage '''
 ##################################################################################################################
 ##################################################################################################################
-    def __init__(self, appendage_no, pwm, pwm2 ):
+    def __init__(self, appendage_no, pwm, pwm2, doservo ):
         self.robot_description = RobotDescription()
         self.robot_description.ReadParameters()
         self.an = appendage_no
-        if DOSERVO:
+        self.DOSERVO = doservo
+        if self.DOSERVO:
             self.pwm = pwm
             self.pwm2 = pwm2
         self.jsPub = rospy.Publisher( "joint_states" + str(self.an), JointState )
@@ -61,14 +59,18 @@ class msgHandler():
 ##################################################################################################################
     def setServo(self,channel, angle):
 ##################################################################################################################
-        pulse = angle * (self.servoMax - self.servoMin) / 180 + self.servoMin
-        # print "Angle = %d, setting pwm to %0.3f on channel %d" % (angle, pulse, channel)
+        pulse = int( (angle / 3.1416 + 0.5) * (self.servoMax - self.servoMin) + self.servoMin )
+        rospy.logdebug("Angle = %0.3f, setting pwm to %0.3f on channel %d" % (angle, pulse, channel))
 
-        if DOSERVO:
+        if self.DOSERVO:
+            rospy.logdebug("serial_node setServo setting channel %d to pulse %d" %(channel, angle))
             if channel < 16:
                 self.pwm.setPWM(channel, 0, pulse)
             else:
                 self.pwm2.setPWM(channel - 16,0, pulse)
+        else:
+            doservoparam = rospy.get_param('do_servos')
+            rospy.logdebug("serial_node setServo DOSERVO not set, param from launch: %s, DOSERVO: %s" % (doservoparam, str(DOSERVO) ) )
 ##################################################################################################################
     def print_trim(self):
 ##################################################################################################################
@@ -135,16 +137,21 @@ class messageHandler():
         self.jpc_pub = []
         rospy.init_node('jointstate_to_pi')
         
+        self.DOSERVO = rospy.get_param('do_servos','false')
+
+        if self.DOSERVO:
+            from Adafruit_PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
+        
         ### set up command message subscriptions ########
         self.prev_msg = [] * self.robot_description.NAppendages
-        self.servo_setup()
+        self.servo_setup(PWM)
         k=0
         for i in range( self.robot_description.NAppendages ):
             njoints = len( self.robot_description.appendages[i].jointnames )
             prev_msg_tmp = [255] * njoints
             self.prev_msg.append(prev_msg_tmp)
             rospy.loginfo("-D- jointstate_to_pi setting up appendage #%d" % i)
-            s = msgHandler( i, self.pwm, self.pwm2 )
+            s = msgHandler( i, self.pwm, self.pwm2, self.DOSERVO )
             s.servoMax = self.servoMax
             s.servoMin = self.servoMin
             self.command_sub.append( rospy.Subscriber( "command"+str(i), Appendage_state, s.cmd_callback ) )
@@ -158,9 +165,9 @@ class messageHandler():
         self.macro_sub = rospy.Subscriber( "macro_cmd", String, self.macro_callback)
 
 ##################################################################################################################
-    def servo_setup(self):
+    def servo_setup(self, PWM):
 ##################################################################################################################
-        if DOSERVO:
+        if self.DOSERVO:
             self.pwm = PWM(0x40, debug=True)
             self.pwm2 = PWM(0x41, debug=True)
             self.pwm.setPWMFreq(60)
