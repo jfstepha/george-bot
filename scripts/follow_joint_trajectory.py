@@ -54,9 +54,15 @@ class FollowJointAction():
             
             self.set_jointstate_lookup(goal.trajectory.joint_names) 
             rospy.loginfo("robot_action looping over %d points" % len(goal.trajectory.points))
+            start_time = rospy.Time.now()
 
             for i in range(len(goal.trajectory.points)):
-                rospy.loginfo("setting joints to %s" % ( str(goal.trajectory.points[i].positions)))
+                t = goal.trajectory.points[i].time_from_start
+                rospy.loginfo("setting joints to %s, t: %s, time since start: %s" % ( str(goal.trajectory.points[i].positions), str(t), str(rospy.Time.now() - start_time)))
+                
+                while rospy.Time.now() - start_time < t:
+                    rospy.sleep(0.01)
+
 
                 ## check for empty arrays:
                 rospy.loginfo("lengths: command_msg.joints: %d robot_state_index: %d positions: %d" % (
@@ -72,10 +78,10 @@ class FollowJointAction():
 
                 for j in range(len(goal.trajectory.points[i].positions)):
                     self.command_msg.joints[ self.robot_state_index[j] ] = goal.trajectory.points[i].positions[j] 
-                rospy.loginfo("set command_msg.joints to %s" % str( self.command_msg.joints ))
+                rospy.logdebug("set command_msg.joints to %s" % str( self.command_msg.joints ))
 
                 self.command_pub.publish(self.command_msg)
-                rospy.loginfo("robot_action waiting to reach goal #%d" % i)
+                rospy.logdebug("robot_action waiting to reach goal #%d" % i)
                 success = self.waitToReachGoal(self.command_msg)
                 if success:
                     rospy.loginfo("robot_action reached goal")
@@ -143,7 +149,7 @@ class FollowJointAction():
           any_mismatch = False
           rospy.loginfo("comparing joints %s to robot_state %s" % (msg.joints, self.robot_state))
           if len( self.robot_state) < len( msg.joints):
-              rospy.loginfo("robot_state is empty")
+              rospy.logdebug("robot_state is empty")
               rospy.sleep(0.001)
               continue
           for i in range(len(msg.joints)):
@@ -154,11 +160,11 @@ class FollowJointAction():
 #                  # we  should use a tolerance passed in from the goal, but it seems to be empty
                   #f abs(msg.joints[i] - self.robot_state[self.robot_state_index[i]]) > 0.03:
                   if abs(msg.joints[i] - self.robot_state[i]) > 0.03:
-                      rospy.loginfo("robot_action setting mismatch to true")
+                      rospy.logdebug("robot_action setting mismatch to true")
                       any_mismatch = True
                       now_time = rospy.Time.now()
                       elapsed_time = now_time.secs - start_time.secs + (now_time.nsecs - start_time.nsecs) / 1e9
-                      rospy.loginfo("robot_action elapsed time: %0.8f" % (elapsed_time))
+                      rospy.logdebug("robot_action elapsed time: %0.8f" % (elapsed_time))
 #              except :
 #                  rospy.logerr("robot_action exception ! - on joint %s " % (msg.name[i]))
 #          rospy.sleep(0.001)        

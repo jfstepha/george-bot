@@ -8,6 +8,23 @@
   <xacro:macro name="default_inertia">
 	<inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
   </xacro:macro>
+
+  <link name="torso_mass">
+      <visual>
+          <geometry>
+              <box size=".001 .001 .001"/>
+          </geometry>
+      </visual>
+      <collision>
+         <geometry>
+             <box size=".001 .001 .001"/>
+          </geometry>
+      </collision>
+      <inertial>
+          <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+          <mass value="0.4"/>
+      </inertial>
+  </link>
   
   <link name="base_link">
     <visual>
@@ -52,7 +69,7 @@
 	<origin rpy="0 0 0" xyz="${offset} 0 -0.00825"/>
       </collision>
       <inertial>
-	<mass value="0.045"/>
+	<mass value="0.055"/>
 	<xacro:default_inertia/>
       </inertial>
     </link>
@@ -494,6 +511,12 @@
   
   
   <xacro:servo_bp prefix="LWaist" rot="${M_PI/2}" />
+  
+  <joint name="torso_to_base" type="fixed">
+    <parent link="base_link"/>
+    <child link="torso_mass"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
   
   <joint name="torso_to_lwaist" type="fixed">
     <parent link="base_link"/>

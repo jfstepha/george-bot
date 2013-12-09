@@ -2,7 +2,7 @@
     <machine name="robot" address="$(env ROBOT)" env-loader="$(env ENV_LOADER)" user="jfstepha" timeout="240"/>
     <!-- see http://www.ros.org/wiki/roslaunch/XML/machine -->
 	<include file="$(find george)/launch/rqt_george_noser.launch" />
-	<param name="do_servos" value="true" />     
+	<param name="do_servos" value="false" />     
 	<node machine="robot" pkg="george" type="serial_node.py" name="serial_node" output="screen">
 		<remap from="command0" to="/joint0_position_controller/joint_cmd" /> 
 		<remap from="command1" to="/joint1_position_controller/joint_cmd" /> 
