@@ -15,6 +15,8 @@ from std_msgs.msg import String
 from robotDescription import *
 from george.srv import *
 robot_description = RobotDescription()
+from moveit_ros_planning_interface import _moveit_move_group_interface
+
 ##########################################################################
 ##########################################################################
 class Communicate(QtCore.QObject):
