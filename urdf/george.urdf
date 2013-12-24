@@ -2429,7 +2429,7 @@
     <child link="RWristTwist_servo_body"/>
     <origin rpy="1.5708 0 1.5708" xyz="0.0144 0 -0.0142"/>
   </joint>
-  <link name="gripper_base">
+  <link name="RHand_base">
     <visual>
       <geometry>
         <mesh filename="package://george/meshes/gripper-base.dae" scale="1 1 1"/>
@@ -2449,7 +2449,7 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <link name="gripper_lfinger">
+  <link name="RHand_lfinger">
     <visual>
       <geometry>
         <mesh filename="package://george/meshes/gripper-lfinger.dae" scale="1 1 1"/>
@@ -2469,14 +2469,14 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gripper_lfinger_to_base" type="fixed">
+  <joint name="RHand_lfinger_to_base" type="fixed">
     <axis xyz="0 1 0"/>
-    <parent link="gripper_base"/>
-    <child link="gripper_lfinger"/>
+    <parent link="RHand_base"/>
+    <child link="RHand_lfinger"/>
     <origin rpy="0 -1.5708 0" xyz="0 0 0"/>
     <limit effort="1000.0" lower="-0.005" upper="0.0137" velocity="0.5"/>
   </joint>
-  <link name="gripper_rfinger">
+  <link name="RHand_rfinger">
     <visual>
       <geometry>
         <mesh filename="package://george/meshes/gripper-rfinger.dae" scale="1 1 1"/>
@@ -2496,15 +2496,15 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gripper_rfinger_to_base" type="fixed">
+  <joint name="RHand_rfinger_to_base" type="fixed">
     <!--joint name="${name}_rfinger_to_base" type="prismatic"-->
     <axis xyz="0 1 0"/>
-    <parent link="gripper_base"/>
-    <child link="gripper_rfinger"/>
+    <parent link="RHand_base"/>
+    <child link="RHand_rfinger"/>
     <origin rpy="0 -1.5708 0" xyz="0 0 0"/>
     <limit effort="1000.0" lower="-0.0137" upper="0.005" velocity="0.5"/>
   </joint>
-  <link name="gripper_servo_body">
+  <link name="RHand_servo_body">
     <visual>
       <geometry>
         <box size=".040 .02 .0365"/>
@@ -2525,7 +2525,7 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <link name="gripper_servo_lip">
+  <link name="RHand_servo_lip">
     <visual>
       <geometry>
         <box size=".0528 .02 .002"/>
@@ -2546,7 +2546,7 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <link name="gripper_servo_horn">
+  <link name="RHand_servo_horn">
     <visual>
       <geometry>
         <cylinder length="0.001" radius="0.012"/>
@@ -2567,26 +2567,26 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gripper_servo_lip_to_body" type="fixed">
-    <parent link="gripper_servo_body"/>
-    <child link="gripper_servo_lip"/>
+  <joint name="RHand_servo_lip_to_body" type="fixed">
+    <parent link="RHand_servo_body"/>
+    <child link="RHand_servo_lip"/>
     <origin xyz="0 0 0"/>
   </joint>
-  <joint name="gripper" type="revolute">
+  <joint name="RHand" type="revolute">
     <axis xyz="0 0 -1"/>
     <limit effort="1000.0" lower="-1.5708" upper="1.5708" velocity="0.5"/>
-    <parent link="gripper_servo_body"/>
-    <child link="gripper_servo_horn"/>
+    <parent link="RHand_servo_body"/>
+    <child link="RHand_servo_horn"/>
     <origin rpy="0 0 0" xyz=".01 0 0.0161"/>
   </joint>
-  <joint name="gripper_servo_to_base" type="fixed">
-    <parent link="gripper_base"/>
-    <child link="gripper_servo_body"/>
+  <joint name="RHand_servo_to_base" type="fixed">
+    <parent link="RHand_base"/>
+    <child link="RHand_servo_body"/>
     <origin rpy="1.5708 0 -1.5708" xyz="0.0058 0.0095 0.01195"/>
   </joint>
   <joint name="gripper_to_wrist" type="fixed">
     <parent link="RWristTwist_servo_horn"/>
-    <child link="gripper_base"/>
+    <child link="RHand_base"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
   <link name="rtip1">
@@ -2600,10 +2600,10 @@
       </material>
     </visual>
   </link>
-  <joint name="RHand" type="revolute">
+  <joint name="rtip1" type="fixed">
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="-1.5708" upper="1.5708" velocity="0.5"/>
-    <parent link="gripper_base"/>
+    <parent link="RHand_base"/>
     <child link="rtip1"/>
     <origin rpy="0 1.5708 0" xyz="0 0 0.070"/>
   </joint>

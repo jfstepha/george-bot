@@ -984,11 +984,11 @@
     <origin xyz="${0.0134+.001} 0 -0.0142" rpy="${M_PI/2} 0 ${M_PI/2}"/>
   </joint>
   
-  <xacro:gripper name="gripper" />
+  <xacro:gripper name="RHand" />
   
   <joint name="gripper_to_wrist" type="fixed">
     <parent link="RWristTwist_servo_horn"/>
-    <child link="gripper_base"/>
+    <child link="RHand_base"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
   
@@ -1003,10 +1003,10 @@
       </material>
     </visual>
   </link>
-  <joint name="RHand" type="revolute">
+  <joint name="rtip1" type="fixed">
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
-    <parent link="gripper_base"/>
+    <parent link="RHand_base"/>
     <child link="rtip1"/>
     <origin xyz="0 0 0.070" rpy="0 ${M_PI/2} 0"/> 
   </joint>

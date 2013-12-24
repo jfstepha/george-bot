@@ -19,11 +19,6 @@ joint_limits:
     max_velocity: 0.5
     has_acceleration_limits: false
     max_acceleration: 0
-  rtip2_to_rtip3:
-    has_velocity_limits: true
-    max_velocity: 0.5
-    has_acceleration_limits: false
-    max_acceleration: 0
   ltip1_to_ltube:
     has_velocity_limits: true
     max_velocity: 0.5
@@ -45,11 +40,6 @@ joint_limits:
     has_acceleration_limits: false
     max_acceleration: 0
   LHip:
-    has_velocity_limits: true
-    max_velocity: 0.5
-    has_acceleration_limits: false
-    max_acceleration: 0
-  rtip1_to_rtip2:
     has_velocity_limits: true
     max_velocity: 0.5
     has_acceleration_limits: false
@@ -90,6 +80,16 @@ joint_limits:
     has_acceleration_limits: false
     max_acceleration: 0
   RHand:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: false
+    max_acceleration: 0
+  rtip1_to_rtip2:
+    has_velocity_limits: true
+    max_velocity: 0.5
+    has_acceleration_limits: false
+    max_acceleration: 0
+  rtip2_to_rtip3:
     has_velocity_limits: true
     max_velocity: 0.5
     has_acceleration_limits: false

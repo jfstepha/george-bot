@@ -1,0 +1,22 @@
+## 
+## All code is hosted on Google Code.
+## There are 2 versions:  devel and install.
+## The devel is what I'm currently editing, the install should be the latest "working" copy. 
+
+## To setup for local simulation mode:
+source ~/setup_local_devel.sh
+
+## or
+source ~/setup_local_install.sh
+
+## To setup to actually use the robot, run on both the host and the pi:
+source ~/setup_pi_install.sh
+
+## To run moveit:  (This crashes, have to try several times to get it to work)
+roslaunch george moveit_live.sh
+# hit "send" on the commander window to send the home state to the robot.
+
+
+## To also run the gazebo simulator:
+roslaunch george george_world.launch
+# press the "play" button to start the simulation.
