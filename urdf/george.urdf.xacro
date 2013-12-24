@@ -134,8 +134,7 @@
       <origin xyz="0 0 0"/>
     </joint>
   
-  
-  <joint name="${prefix}" type="revolute">
+  <joint name="${prefix}" type="revolute" >
     <axis xyz="0 0 -1"/>
     <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
     <parent link="${prefix}_servo_body"/>
@@ -408,7 +407,8 @@
     
   </link>
   
-  <joint name="${name}_lfinger_to_base" type="prismatic">
+  <!--joint name="${name}_lfinger_to_base" type="prismatic"-->
+  <joint name="${name}_lfinger_to_base" type="fixed">
     <axis xyz="0 1 0"/>
     <parent link="${name}_base"/>
     <child link="${name}_lfinger"/>
@@ -438,7 +438,8 @@
     
   </link>
   
-  <joint name="${name}_rfinger_to_base" type="prismatic">
+  <joint name="${name}_rfinger_to_base" type="fixed">
+  <!--joint name="${name}_rfinger_to_base" type="prismatic"-->
     <axis xyz="0 1 0"/>
     <parent link="${name}_base"/>
     <child link="${name}_rfinger"/>
@@ -1002,7 +1003,6 @@
       </material>
     </visual>
   </link>
-  
   <joint name="RHand" type="revolute">
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="-${M_PI/2}" upper="${M_PI/2}" velocity="0.5"/>
@@ -1010,7 +1010,7 @@
     <child link="rtip1"/>
     <origin xyz="0 0 0.070" rpy="0 ${M_PI/2} 0"/> 
   </joint>
-  
+
   <link name="rtip2">
     <visual>
       <geometry>

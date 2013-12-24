@@ -23,7 +23,7 @@
     </collision>
     <inertial>
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
-      <mass value="0.1"/>
+      <mass value="0.4"/>
     </inertial>
   </link>
   <link name="base_link">
@@ -2469,7 +2469,7 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gripper_lfinger_to_base" type="prismatic">
+  <joint name="gripper_lfinger_to_base" type="fixed">
     <axis xyz="0 1 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_lfinger"/>
@@ -2496,7 +2496,8 @@
       <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
     </inertial>
   </link>
-  <joint name="gripper_rfinger_to_base" type="prismatic">
+  <joint name="gripper_rfinger_to_base" type="fixed">
+    <!--joint name="${name}_rfinger_to_base" type="prismatic"-->
     <axis xyz="0 1 0"/>
     <parent link="gripper_base"/>
     <child link="gripper_rfinger"/>

@@ -15,7 +15,7 @@ from std_msgs.msg import String
 from robotDescription import *
 from george.srv import *
 robot_description = RobotDescription()
-from moveit_ros_planning_interface import _moveit_move_group_interface
+from moveit_commander import MoveGroupCommander 
 
 ##########################################################################
 ##########################################################################
@@ -33,6 +33,9 @@ class ButtonPanel(QtGui.QWidget):
         
         QtGui.QWidget.__init__(self)
         self.init_ros_params()
+        self.lfoot_group = MoveGroupCommander("legs")
+        self.rfoot_group = MoveGroupCommander("legs")
+        
         self.parent = parent
         btnw = 40
         btnh = 20
@@ -80,6 +83,34 @@ class ButtonPanel(QtGui.QWidget):
         self.loadtrim_button.setText('Load Trim')
         self.loadtrim_button.clicked.connect( self.on_loadtrim_button_clicked )
         self.loadtrim_button.setMinimumSize(btnw,btnh)
+        
+        self.lfoot_button= QtGui.QPushButton()
+        self.lfoot_button.setText("LFoot")
+        self.lfoot_button.clicked.connect( self.on_lfoot_button_clicked )
+        self.lfoot_button.setMinimumSize(btnw,btnh)
+        
+        self.lfoot_x = QtGui.QLineEdit("0.045")
+        self.lfoot_y = QtGui.QLineEdit("0.000")
+        self.lfoot_z = QtGui.QLineEdit("-0.19")
+
+        self.rfoot_button= QtGui.QPushButton()
+        self.rfoot_button.setText("RFoot")
+        self.rfoot_button.clicked.connect( self.on_rfoot_button_clicked )
+        self.rfoot_button.setMinimumSize(btnw,btnh)
+        
+        self.rfoot_x = QtGui.QLineEdit("-0.045")
+        self.rfoot_y = QtGui.QLineEdit("0.000")
+        self.rfoot_z = QtGui.QLineEdit("-0.19")
+
+        self.print_pose_button= QtGui.QPushButton()
+        self.print_pose_button.setText("pose print")
+        self.print_pose_button.clicked.connect( self.on_print_pose_button_clicked )
+        self.print_pose_button.setMinimumSize(btnw,btnh)
+  
+        self.legs_button= QtGui.QPushButton()
+        self.legs_button.setText("both feet")
+        self.legs_button.clicked.connect( self.on_legs_button_clicked )
+        self.legs_button.setMinimumSize(btnw,btnh)
   
         self.panelLayout.addWidget(self.home_button,0,0)
         self.panelLayout.addWidget(self.copy_button,0,1)
@@ -89,6 +120,16 @@ class ButtonPanel(QtGui.QWidget):
         self.panelLayout.addWidget(self.printtrim_button,1,1)
         self.panelLayout.addWidget(self.savetrim_button,1,2)
         self.panelLayout.addWidget(self.loadtrim_button,1,3)
+        self.panelLayout.addWidget(self.lfoot_button,2,0)
+        self.panelLayout.addWidget(self.lfoot_x,2,1)
+        self.panelLayout.addWidget(self.lfoot_y,2,2)
+        self.panelLayout.addWidget(self.lfoot_z,2,3)
+        self.panelLayout.addWidget(self.rfoot_button,3,0)
+        self.panelLayout.addWidget(self.rfoot_x,3,1)
+        self.panelLayout.addWidget(self.rfoot_y,3,2)
+        self.panelLayout.addWidget(self.rfoot_z,3,3)
+        self.panelLayout.addWidget(self.print_pose_button,4,0)
+        self.panelLayout.addWidget(self.legs_button,4,1)
         
     def init_ros_params(self): 
         robot_description.ReadParameters()
@@ -128,8 +169,73 @@ class ButtonPanel(QtGui.QWidget):
     def on_loadtrim_button_clicked(self):
         rospy.logdebug("load trim button clicked")
         self.macro_cmd_pub.publish("load_trim")
+
+    def on_lfoot_button_clicked(self):
+        rospy.logdebug("lfoot button clicked")
+        end_effector_link="lfoot"
+        x = float(self.lfoot_x.text())
+        y = float(self.lfoot_y.text())
+        z = float(self.lfoot_z.text())
+        self.move_foot( self.lfoot_group, end_effector_link, x, y, z )
+
+    def on_rfoot_button_clicked(self):
+        rospy.logdebug("rfoot button clicked")
+        end_effector_link="rfoot"
+        x = float(self.rfoot_x.text())
+        y = float(self.rfoot_y.text())
+        z = float(self.rfoot_z.text())
+        self.move_foot( self.rfoot_group, end_effector_link, x, y, z )
+
+    def move_foot(self, group, end_effector_link, x, y, z):
+        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
+        if len(end_effector_link) > 0 or self.has_end_effector_link():
+            rospy.logdebug("setting target")
+            r = group.set_pose_target(pose, end_effector_link)
+            rospy.loginfo("set position target returned %s" % str(r)) 
+            rospy.logdebug("going")
+            r =  group.go()
+            rospy.loginfo("go returned %s" % str(r)) 
+        else:
+            rospy.logerr("There is no end effector to set the pose for")
         
 
+    def on_legs_button_clicked(self):
+        group = self.lfoot_group
+        rospy.logdebug("legs button clicked")
+        end_effector_link="rfoot"
+        x = float(self.rfoot_x.text())
+        y = float(self.rfoot_y.text())
+        z = float(self.rfoot_z.text())
+        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
+        if len(end_effector_link) > 0 or self.has_end_effector_link():
+            rospy.logdebug("setting rfoot target")
+            r = group.set_pose_target(pose, end_effector_link)
+            rospy.loginfo("set position target returned %s" % str(r)) 
+
+        rospy.logdebug("legs button clicked")
+        end_effector_link="lfoot"
+        x = float(self.lfoot_x.text())
+        y = float(self.lfoot_y.text())
+        z = float(self.lfoot_z.text())
+        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
+        if len(end_effector_link) > 0 or self.has_end_effector_link():
+            rospy.logdebug("setting lfoot target")
+            r = group.set_pose_target(pose, end_effector_link)
+            rospy.loginfo("set position target returned %s" % str(r)) 
+            r =  group.go()
+            rospy.loginfo("go returned %s" % str(r)) 
+
+    def on_print_pose_button_clicked(self):
+        group = self.lfoot_group
+        end_effector_link = "lfoot"
+        pose = group.get_current_pose( end_effector_link)
+        rospy.loginfo("Left foot pose: %s" % pose)
+
+        group = self.rfoot_group
+        end_effector_link = "rfoot"
+        pose = group.get_current_pose( end_effector_link)
+        rospy.loginfo("Right foot pose: %s" % pose)
+        
 ##########################################################################
 ##########################################################################
 class CmdrPlugin(Plugin):
@@ -198,7 +304,8 @@ class CmdrPlugin(Plugin):
         
         
     def on_timer_update(self):
-       rospy.logdebug( "-D- tick")
+       # rospy.logdebug( "-D- tick")
+       pass
     
     def shutdown_plugin(self):
         # TODO unregister all publishers here
