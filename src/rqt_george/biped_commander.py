@@ -16,6 +16,7 @@ from robotDescription import *
 from george.srv import *
 robot_description = RobotDescription()
 from moveit_commander import MoveGroupCommander 
+from BipedCommander import *
 
 ##########################################################################
 ##########################################################################
@@ -33,6 +34,7 @@ class ButtonPanel(QtGui.QWidget):
         
         QtGui.QWidget.__init__(self)
         self.init_ros_params()
+        self.bipedCommander = BipedCommander()
         self.lfoot_group = MoveGroupCommander("legs")
         self.rfoot_group = MoveGroupCommander("legs")
         
@@ -176,6 +178,7 @@ class ButtonPanel(QtGui.QWidget):
         x = float(self.lfoot_x.text())
         y = float(self.lfoot_y.text())
         z = float(self.lfoot_z.text())
+        self.bipedCommander.move_lfoot( x,y,z )
         self.move_foot( self.lfoot_group, end_effector_link, x, y, z )
 
     def on_rfoot_button_clicked(self):
