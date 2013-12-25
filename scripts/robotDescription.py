@@ -45,15 +45,15 @@ class RobotDescription():
         self.name = rospy.get_param('robot_name')
         self.NAppendages = rospy.get_param('NAppendages')
         for i in range(self.NAppendages): 
-            rospy.loginfo('Getting appendage #' + str(i))
+            rospy.logdebug('Getting appendage #' + str(i))
             appendage_name = rospy.get_param('appendage_name' + str(i))
             appendage_nservos = rospy.get_param('nservos' + str(i))
             appendage_firstservo = rospy.get_param('firstservo' + str(i))
             jointnames_str = rospy.get_param('joints' + str(i))
             jointnames = jointnames_str.split(',')
             self.AddAppendage(appendage_name, appendage_nservos, appendage_firstservo, jointnames)
-        rospy.loginfo("robot description:")
-        rospy.loginfo(self.str())
+        rospy.logdebug("robot description:")
+        rospy.logdebug(self.str())
     ###########################################################       
     def AddAppendage(self, appendage_name="", nservos=0, firstservo=0, jointnames=[]):
     ###########################################################       

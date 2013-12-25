@@ -63,13 +63,13 @@ class msgHandler():
         rospy.logdebug("Angle = %0.3f, setting pwm to %0.3f on channel %d" % (angle, pulse, channel))
 
         if self.DOSERVO:
-            rospy.loginfo("serial_node setServo setting channel %d to pulse %d" %(channel, angle))
+            rospy.logdebug("serial_node setServo setting channel %d to pulse %d" %(channel, angle))
             if channel < 16:
                 self.pwm.setPWM(channel, 0, pulse)
             else:
                 self.pwm2.setPWM(channel - 16,0, pulse)
         else:
-            rospy.loginfo("serial_node setServo DOSERVO not set, param from launch: DOSERVO: %s" % (str(self.DOSERVO) ) )
+            rospy.logdebug("serial_node setServo DOSERVO not set, param from launch: DOSERVO: %s" % (str(self.DOSERVO) ) )
 ##################################################################################################################
     def print_trim(self):
 ##################################################################################################################

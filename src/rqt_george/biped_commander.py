@@ -113,6 +113,26 @@ class ButtonPanel(QtGui.QWidget):
         self.legs_button.setText("both feet")
         self.legs_button.clicked.connect( self.on_legs_button_clicked )
         self.legs_button.setMinimumSize(btnw,btnh)
+
+        self.walk1_button= QtGui.QPushButton()
+        self.walk1_button.setText("walk1")
+        self.walk1_button.clicked.connect( self.on_walk1_button_clicked )
+        self.walk1_button.setMinimumSize(btnw,btnh)
+
+        self.walk2_button= QtGui.QPushButton()
+        self.walk2_button.setText("walk lstep")
+        self.walk2_button.clicked.connect( self.on_walk2_button_clicked )
+        self.walk2_button.setMinimumSize(btnw,btnh)
+
+        self.walk3_button= QtGui.QPushButton()
+        self.walk3_button.setText("walk rstep")
+        self.walk3_button.clicked.connect( self.on_walk3_button_clicked )
+        self.walk3_button.setMinimumSize(btnw,btnh)
+
+        self.walk4_button= QtGui.QPushButton()
+        self.walk4_button.setText("rstep2home")
+        self.walk4_button.clicked.connect( self.on_walk4_button_clicked )
+        self.walk4_button.setMinimumSize(btnw,btnh)
   
         self.panelLayout.addWidget(self.home_button,0,0)
         self.panelLayout.addWidget(self.copy_button,0,1)
@@ -132,6 +152,10 @@ class ButtonPanel(QtGui.QWidget):
         self.panelLayout.addWidget(self.rfoot_z,3,3)
         self.panelLayout.addWidget(self.print_pose_button,4,0)
         self.panelLayout.addWidget(self.legs_button,4,1)
+        self.panelLayout.addWidget(self.walk1_button,5,0)
+        self.panelLayout.addWidget(self.walk2_button,5,1)
+        self.panelLayout.addWidget(self.walk3_button,5,2)
+        self.panelLayout.addWidget(self.walk4_button,5,3)
         
     def init_ros_params(self): 
         robot_description.ReadParameters()
@@ -179,7 +203,6 @@ class ButtonPanel(QtGui.QWidget):
         y = float(self.lfoot_y.text())
         z = float(self.lfoot_z.text())
         self.bipedCommander.move_lfoot( x,y,z )
-        self.move_foot( self.lfoot_group, end_effector_link, x, y, z )
 
     def on_rfoot_button_clicked(self):
         rospy.logdebug("rfoot button clicked")
@@ -187,57 +210,35 @@ class ButtonPanel(QtGui.QWidget):
         x = float(self.rfoot_x.text())
         y = float(self.rfoot_y.text())
         z = float(self.rfoot_z.text())
-        self.move_foot( self.rfoot_group, end_effector_link, x, y, z )
-
-    def move_foot(self, group, end_effector_link, x, y, z):
-        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
-        if len(end_effector_link) > 0 or self.has_end_effector_link():
-            rospy.logdebug("setting target")
-            r = group.set_pose_target(pose, end_effector_link)
-            rospy.loginfo("set position target returned %s" % str(r)) 
-            rospy.logdebug("going")
-            r =  group.go()
-            rospy.loginfo("go returned %s" % str(r)) 
-        else:
-            rospy.logerr("There is no end effector to set the pose for")
-        
+        self.bipedCommander.move_rfoot( x,y,z )
 
     def on_legs_button_clicked(self):
-        group = self.lfoot_group
         rospy.logdebug("legs button clicked")
-        end_effector_link="rfoot"
-        x = float(self.rfoot_x.text())
-        y = float(self.rfoot_y.text())
-        z = float(self.rfoot_z.text())
-        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
-        if len(end_effector_link) > 0 or self.has_end_effector_link():
-            rospy.logdebug("setting rfoot target")
-            r = group.set_pose_target(pose, end_effector_link)
-            rospy.loginfo("set position target returned %s" % str(r)) 
+        lx = float(self.lfoot_x.text())
+        ly = float(self.lfoot_y.text())
+        lz = float(self.lfoot_z.text())
 
-        rospy.logdebug("legs button clicked")
-        end_effector_link="lfoot"
-        x = float(self.lfoot_x.text())
-        y = float(self.lfoot_y.text())
-        z = float(self.lfoot_z.text())
-        pose = [x, y, z, 0, 0.7071, 0.7071, 0]
-        if len(end_effector_link) > 0 or self.has_end_effector_link():
-            rospy.logdebug("setting lfoot target")
-            r = group.set_pose_target(pose, end_effector_link)
-            rospy.loginfo("set position target returned %s" % str(r)) 
-            r =  group.go()
-            rospy.loginfo("go returned %s" % str(r)) 
+        rx = float(self.rfoot_x.text())
+        ry = float(self.rfoot_y.text())
+        rz = float(self.rfoot_z.text())
+        
+        self.bipedCommander.move_legs( lx, ly, lz, rx, ry, rz)
+        
 
     def on_print_pose_button_clicked(self):
-        group = self.lfoot_group
-        end_effector_link = "lfoot"
-        pose = group.get_current_pose( end_effector_link)
-        rospy.loginfo("Left foot pose: %s" % pose)
+        self.bipedCommander.pose_print()
 
-        group = self.rfoot_group
-        end_effector_link = "rfoot"
-        pose = group.get_current_pose( end_effector_link)
-        rospy.loginfo("Right foot pose: %s" % pose)
+    def on_walk1_button_clicked(self):
+        self.bipedCommander.walk_first_step()
+
+    def on_walk2_button_clicked(self):
+        self.bipedCommander.walk_left_step()
+
+    def on_walk3_button_clicked(self):
+        self.bipedCommander.walk_right_step()
+
+    def on_walk4_button_clicked(self):
+        self.bipedCommander.walk_right2home()
         
 ##########################################################################
 ##########################################################################

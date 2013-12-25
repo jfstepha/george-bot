@@ -158,7 +158,7 @@ class sliderPanel(QtGui.QWidget):
             self.last_changed = rospy.Time.now()
     def set_progressbar(self, value):
         v2 = (value  + 3.1416 / 2.0) / 3.1416 * 180.0
-        rospy.loginfo("set_progressbar %s (%d) to %0.3f (original=%0.3f)" % (self.name, self.index, v2, value))
+        rospy.logdebug("set_progressbar %s (%d) to %0.3f (original=%0.3f)" % (self.name, self.index, v2, value))
         self.c.pbar_val.emit(v2)
 
         

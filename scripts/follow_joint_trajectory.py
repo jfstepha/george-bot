@@ -147,7 +147,7 @@ class FollowJointAction():
           rospy.loginfo("  waiting...")
           
           any_mismatch = False
-          rospy.loginfo("comparing joints %s to robot_state %s" % (msg.joints, self.robot_state))
+          rospy.logdebug("comparing joints %s to robot_state %s" % (msg.joints, self.robot_state))
           if len( self.robot_state) < len( msg.joints):
               rospy.logdebug("robot_state is empty")
               rospy.sleep(0.001)
@@ -155,8 +155,8 @@ class FollowJointAction():
           for i in range(len(msg.joints)):
 #              try:
                   any_mismatch = False
-                  rospy.loginfo("joints is %d long, robot_state is %d long" % (len(msg.joints), len(self.robot_state)))
-                  rospy.loginfo("robot_action - comparing state of #%d: %0.3f vs %0.3f" % (i, msg.joints[i], self.robot_state[i]))
+                  rospy.logdebug("joints is %d long, robot_state is %d long" % (len(msg.joints), len(self.robot_state)))
+                  rospy.logdebug("robot_action - comparing state of #%d: %0.3f vs %0.3f" % (i, msg.joints[i], self.robot_state[i]))
 #                  # we  should use a tolerance passed in from the goal, but it seems to be empty
                   #f abs(msg.joints[i] - self.robot_state[self.robot_state_index[i]]) > 0.03:
                   if abs(msg.joints[i] - self.robot_state[i]) > 0.03:
