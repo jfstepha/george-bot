@@ -95,7 +95,7 @@ class msgHandler():
         njoints = self.robot_description.appendages[self.an].nservos
     
         for i in range( njoints ):
-            newtrim = 0 - self.positions[i] + self.trims[i]
+            newtrim = 0 + self.positions[i] + self.trims[i]
             rospy.logdebug("serial_node set_trim an: %d joint %d joint value: %0.3f prev_trim: %0.3f new_trim %0.3f" % 
                           (self.an, i, self.positions[i], self.trims[i], newtrim) )
             self.trims[i] = newtrim

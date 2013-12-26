@@ -104,6 +104,24 @@ class ButtonPanel(QtGui.QWidget):
         self.rfoot_y = QtGui.QLineEdit("0.000")
         self.rfoot_z = QtGui.QLineEdit("-0.19")
 
+        self.larm_button= QtGui.QPushButton()
+        self.larm_button.setText("LArm")
+        self.larm_button.clicked.connect( self.on_larm_button_clicked )
+        self.larm_button.setMinimumSize(btnw,btnh)
+        
+        self.larm_x = QtGui.QLineEdit("0.278")
+        self.larm_y = QtGui.QLineEdit("0.059")
+        self.larm_z = QtGui.QLineEdit("0.089")
+
+        self.rarm_button= QtGui.QPushButton()
+        self.rarm_button.setText("RArm")
+        self.rarm_button.clicked.connect( self.on_rarm_button_clicked )
+        self.rarm_button.setMinimumSize(btnw,btnh)
+        
+        self.rarm_x = QtGui.QLineEdit("-0.213")
+        self.rarm_y = QtGui.QLineEdit("0.060")
+        self.rarm_z = QtGui.QLineEdit("0.069")
+
         self.print_pose_button= QtGui.QPushButton()
         self.print_pose_button.setText("pose print")
         self.print_pose_button.clicked.connect( self.on_print_pose_button_clicked )
@@ -150,12 +168,20 @@ class ButtonPanel(QtGui.QWidget):
         self.panelLayout.addWidget(self.rfoot_x,3,1)
         self.panelLayout.addWidget(self.rfoot_y,3,2)
         self.panelLayout.addWidget(self.rfoot_z,3,3)
-        self.panelLayout.addWidget(self.print_pose_button,4,0)
-        self.panelLayout.addWidget(self.legs_button,4,1)
-        self.panelLayout.addWidget(self.walk1_button,5,0)
-        self.panelLayout.addWidget(self.walk2_button,5,1)
-        self.panelLayout.addWidget(self.walk3_button,5,2)
-        self.panelLayout.addWidget(self.walk4_button,5,3)
+        self.panelLayout.addWidget(self.larm_button,4,0)
+        self.panelLayout.addWidget(self.larm_x,4,1)
+        self.panelLayout.addWidget(self.larm_y,4,2)
+        self.panelLayout.addWidget(self.larm_z,4,3)
+        self.panelLayout.addWidget(self.rarm_button,5,0)
+        self.panelLayout.addWidget(self.rarm_x,5,1)
+        self.panelLayout.addWidget(self.rarm_y,5,2)
+        self.panelLayout.addWidget(self.rarm_z,5,3)
+        self.panelLayout.addWidget(self.print_pose_button,6,0)
+        self.panelLayout.addWidget(self.legs_button,6,1)
+        self.panelLayout.addWidget(self.walk1_button,7,0)
+        self.panelLayout.addWidget(self.walk2_button,7,1)
+        self.panelLayout.addWidget(self.walk3_button,7,2)
+        self.panelLayout.addWidget(self.walk4_button,7,3)
         
     def init_ros_params(self): 
         robot_description.ReadParameters()
@@ -211,6 +237,20 @@ class ButtonPanel(QtGui.QWidget):
         y = float(self.rfoot_y.text())
         z = float(self.rfoot_z.text())
         self.bipedCommander.move_rfoot( x,y,z )
+
+    def on_larm_button_clicked(self):
+        rospy.logdebug("larm button clicked")
+        x = float(self.larm_x.text())
+        y = float(self.larm_y.text())
+        z = float(self.larm_z.text())
+        self.bipedCommander.move_larm( x,y,z )
+
+    def on_rarm_button_clicked(self):
+        rospy.logdebug("rarm button clicked")
+        x = float(self.rarm_x.text())
+        y = float(self.rarm_y.text())
+        z = float(self.rarm_z.text())
+        self.bipedCommander.move_rarm( x,y,z )
 
     def on_legs_button_clicked(self):
         rospy.logdebug("legs button clicked")

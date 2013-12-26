@@ -6,7 +6,7 @@ from moveit_commander import MoveGroupCommander
 ## walking parameters
 x_spread = 0.045   # from center to foot
 y_start = 0.0 
-z_start = -0.19
+z_start = -0.195
         
 z_squat = -0.185
 step_height = 0.01
@@ -24,6 +24,9 @@ class BipedCommander():
             rospy.loginfo("BipedCommander started")
             self.legs_group = MoveGroupCommander("legs")
             self.arms_group = MoveGroupCommander("arms")
+            self.rarm_group = MoveGroupCommander("RArm")
+            self.larm_group = MoveGroupCommander("LArm")
+
             
     ##########################################################################
     def move_lfoot(self, x, y, z):
@@ -49,6 +52,38 @@ class BipedCommander():
             rospy.loginfo("set position target returned %s" % str(r)) 
             rospy.logdebug("going")
             r =  self.legs_group.go()
+            rospy.loginfo("go returned %s" % str(r)) 
+        else:
+            rospy.logerr("There is no end effector to set the pose for")
+
+    ##########################################################################
+    def move_larm(self, x, y, z):
+    ##########################################################################
+        rospy.loginfo("BipedCommander move_rarm")
+        end_effector_link = "ltip3"
+        group = self.larm_group
+        self.move_arm( group, end_effector_link, x, y, z)
+
+    ##########################################################################
+    def move_rarm(self, x, y, z):
+    ##########################################################################
+        rospy.loginfo("BipedCommander move_rarm")
+        end_effector_link = "rtip3"
+        group = self.arms_group
+        self.move_arm( group, end_effector_link, x, y, z)
+
+
+    ##########################################################################
+    def move_arm(self, group, end_effector_link, x, y, z):
+    ##########################################################################
+        #ose = [x, y, z, -1, 0, 0, 0]
+        pose = [x, y, z ]
+        if len(end_effector_link) > 0 or self.has_end_effector_link():
+            rospy.loginfo("setting target to %s" % pose)
+            r = group.set_position_target(pose, end_effector_link)
+            rospy.loginfo("set position target returned %s" % str(r)) 
+            rospy.logdebug("going")
+            r =  group.go()
             rospy.loginfo("go returned %s" % str(r)) 
         else:
             rospy.logerr("There is no end effector to set the pose for")
@@ -90,13 +125,13 @@ class BipedCommander():
         r = self.arms_group.get_current_pose( end_effector_link)
         p = r.pose.position
         o = r.pose.orientation
-        rospy.loginfo("Left arm pose: [%0.3f, %0.3f, %0.3f], [%0.3f, %0.3f, %0.3f, %0.3f] " % (p.x, p.y, p.z, o.x, o.y, o.z, o.w))
+        rospy.loginfo("Left arm pose: [%0.5f, %0.5f, %0.5f], [%0.3f, %0.3f, %0.3f, %0.3f] " % (p.x, p.y, p.z, o.x, o.y, o.z, o.w))
 
         end_effector_link = "rtip3"
         r = self.arms_group.get_current_pose( end_effector_link)
         p = r.pose.position
         o = r.pose.orientation
-        rospy.loginfo("Right arm pose: [%0.3f, %0.3f, %0.3f], [%0.3f, %0.3f, %0.3f, %0.3f] " % (p.x, p.y, p.z, o.x, o.y, o.z, o.w))
+        rospy.loginfo("Right arm pose: [%0.5f, %0.5f, %0.5f], [%0.3f, %0.3f, %0.3f, %0.3f] " % (p.x, p.y, p.z, o.x, o.y, o.z, o.w))
         
     ##########################################################################
     def walk_pose(self, r_pose, l_pose, pose_name):
