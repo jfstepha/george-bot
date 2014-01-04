@@ -60,9 +60,6 @@ class FollowJointAction():
                 t = goal.trajectory.points[i].time_from_start
                 rospy.loginfo("setting joints to %s, t: %s, time since start: %s" % ( str(goal.trajectory.points[i].positions), str(t), str(rospy.Time.now() - start_time)))
                 
-                while rospy.Time.now() - start_time < t:
-                    rospy.sleep(0.01)
-
 
                 ## check for empty arrays:
                 rospy.loginfo("lengths: command_msg.joints: %d robot_state_index: %d positions: %d" % (
@@ -83,6 +80,11 @@ class FollowJointAction():
                 self.command_pub.publish(self.command_msg)
                 rospy.logdebug("robot_action waiting to reach goal #%d" % i)
                 success = self.waitToReachGoal(self.command_msg)
+
+                # wait for arrival time to make sure it's timed right
+                while rospy.Time.now() - start_time < t:
+                    rospy.sleep(0.025)
+
                 if success:
                     rospy.loginfo("robot_action reached goal")
                     #self._feedback.actual.positions = self.robot_state
@@ -143,7 +145,7 @@ class FollowJointAction():
       
       any_mismatch = True
       elapsed_time = 0
-      while ((elapsed_time < 1.0) & (any_mismatch)):
+      while ((elapsed_time < 3.0) & (any_mismatch)):
           rospy.loginfo("  waiting...")
           
           any_mismatch = False
