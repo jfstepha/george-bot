@@ -7,12 +7,12 @@ project(george)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   roscpp
-  rqt_gui
-  rqt_gui_py
   std_msgs
   message_generation
+  genmsg 
+  actionlib_msgs 
+  trajectory_msgs
 )
-find_package(catkin REQUIRED genmsg actionlib_msgs trajectory_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -77,7 +77,7 @@ generate_messages(DEPENDENCIES actionlib_msgs trajectory_msgs)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES george
-  CATKIN_DEPENDS rospy rqt_gui rqt_gui_py message_runtime common_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime common_msgs
 #  DEPENDS system_lib
 )
 
@@ -88,8 +88,12 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
+include_directories( include
   ${catkin_INCLUDE_DIRS}
+  /usr/share/arduino/x86/cores/arduino
+  /usr/share/arduino/x86/variants/galileo_fab_d
+  /usr/share/arduino/x86/libraries
+  /usr/share/arduino/x86/libraries/SPI
 )
 
 ## Declare a cpp library
@@ -98,16 +102,32 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-# add_executable(george_node src/george_node.cpp)
+add_executable(
+  foot_sensors 
+    src/foot_sensors.cpp 
+    /usr/share/arduino/x86/libraries/SPI/SPI.cpp
+    /usr/share/arduino/x86/cores/arduino/RingBuffer.cpp
+    /usr/share/arduino/x86/cores/arduino/TTYUART.cpp
+    /usr/share/arduino/x86/cores/arduino/WString.cpp
+    /usr/share/arduino/x86/cores/arduino/interrupt.c
+    /usr/share/arduino/x86/cores/arduino/mux.c
+    /usr/share/arduino/x86/cores/arduino/sysfs.c
+    /usr/share/arduino/x86/variants/galileo_fab_d/variant.cpp
+    /usr/share/arduino/x86/cores/arduino/wiring_digital.c
+    /usr/share/arduino/x86/cores/arduino/wiring_analog.c
+    /usr/share/arduino/x86/cores/arduino/Print.cpp
+    /usr/share/arduino/x86/cores/arduino/UtilTime.cpp
+    /usr/share/arduino/x86/cores/arduino/fast_gpio_sc.c
+)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(george_node george_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(george_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(foot_sensors ${catkin_LIBRARIES}
+)
+
 
 #############
 ## Install ##
