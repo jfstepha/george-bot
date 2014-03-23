@@ -8,4 +8,5 @@ import follow_joint_trajectory
 if __name__ == '__main__':
   rospy.init_node('robot_action_rleg')
   server = follow_joint_trajectory.FollowJointAction(rospy.get_name())
-  rospy.spin()
+  server.spin()
+#  rospy.spin()

@@ -39,7 +39,7 @@ class msgHandler():
 ##################################################################################################################
     def cmd_callback(self, val):
 ##################################################################################################################
-        rospy.logdebug( "-D- in servoHandler servo_callback appendage_no %d val:%s" % (self.an, str(val) ) )
+        # rospy.logdebug( "-D- in servoHandler servo_callback appendage_no %d val:%s" % (self.an, str(val) ) )
         # import pdb; pdb.set_trace()
         js = JointState() 
         njoints = self.robot_description.appendages[self.an].nservos
@@ -60,10 +60,10 @@ class msgHandler():
     def setServo(self,channel, angle):
 ##################################################################################################################
         pulse = int( (angle / 3.1416 + 0.5) * (self.servoMax - self.servoMin) + self.servoMin )
-        rospy.logdebug("Angle = %0.3f, setting pwm to %0.3f on channel %d" % (angle, pulse, channel))
+        # rospy.logdebug("Angle = %0.3f, setting pwm to %0.3f on channel %d" % (angle, pulse, channel))
 
         if self.DOSERVO:
-            rospy.logdebug("serial_node setServo setting channel %d to pulse %d" %(channel, angle))
+            # rospy.logdebug("serial_node setServo setting channel %d to pulse %d" %(channel, angle))
             if channel < 16:
                 self.pwm.setPWM(channel, 0, pulse)
             else:
@@ -137,6 +137,7 @@ class messageHandler():
         rospy.init_node('jointstate_to_pi')
         
         self.DOSERVO = rospy.get_param('do_servos','false')
+        ##self.DOSERVO = True
 
         if self.DOSERVO:
             from Adafruit_PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM
@@ -152,7 +153,7 @@ class messageHandler():
             njoints = len( self.robot_description.appendages[i].jointnames )
             prev_msg_tmp = [255] * njoints
             self.prev_msg.append(prev_msg_tmp)
-            rospy.loginfo("-D- jointstate_to_pi setting up appendage #%d" % i)
+            # rospy.loginfo("-D- jointstate_to_pi setting up appendage #%d" % i)
             s = msgHandler( i, self.pwm, self.pwm2, self.DOSERVO )
             s.servoMax = self.servoMax
             s.servoMin = self.servoMin
@@ -231,7 +232,7 @@ class messageHandler():
         rospy.loginfo ("got: %s" % str(trim_dict))
 
         for i in range( self.robot_description.NAppendages ):
-            rospy.logdebug( "Looking up appendage #%d name %s" % ( i, self.robot_description.appendages[i].name))
+            # rospy.logdebug( "Looking up appendage #%d name %s" % ( i, self.robot_description.appendages[i].name))
             self.servo_handlers[i].set_trim_from_dict( trim_dict[ self.robot_description.appendages[i].name ] )
         
 
@@ -260,7 +261,7 @@ class messageHandler():
     def spin(self):
 ##################################################################################################################
         while not(rospy.is_shutdown()):
-            rospy.sleep(0.05)
+            rospy.sleep(0.5)
             self.full_jointstate_publish();
             
 ##################################################################################################################
