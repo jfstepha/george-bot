@@ -258,7 +258,7 @@ class SliderPlugin(Plugin):
     def slider_changed_callback(self, slider_no, value):
         rospy.logdebug( "Slider changed callback, slider %d value: %d" % (slider_no, value))
         self.command_msg.joints[slider_no] = (value / 180.0) * 3.1416 - 3.1416 / 2 
-        # self.command_publish()
+        self.command_publish()
         
     def command_publish(self, docheck=True):
         rospy.logdebug("publishing command message for appendage " + str(self.appendage_no) )

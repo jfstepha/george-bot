@@ -31,7 +31,7 @@ class FollowJointAction():
         self.robot_state_name = []
         #  robot_state[robot_state_index[i]] is the same joint as joint_state[i]
         self.robot_state_index = []
-        self.f = open("~/actionlog" + name, 'w')
+        # self.f = open("~/actionlog" + name, 'w')
     
 
 ###################################################################### 
@@ -39,13 +39,13 @@ class FollowJointAction():
 ###################################################################### 
     # helper variables
         # Override for debug:
-        self.f.write(goal)
+        # self.f.write(goal)
 
         r = rospy.Rate(1000)
         success = True
         rospy.logdebug("-D- robot_action in execute_cb")
         # publish info to the console for the user
-        # rospy.loginfo('%s: Executing trajectory' % self._action_name)
+        rospy.loginfo('%s: Executing trajectory' % self._action_name)
         
         # start executing the action
         if self._as.is_preempt_requested():
@@ -58,12 +58,12 @@ class FollowJointAction():
             #self._feedback.joint_names = goal.trajectory.joint_names
             
             self.set_jointstate_lookup(goal.trajectory.joint_names) 
-            # rospy.loginfo("robot_action looping over %d points" % len(goal.trajectory.points))
+            rospy.loginfo("robot_action looping over %d points" % len(goal.trajectory.points))
             start_time = rospy.Time.now()
 
             for i in range(len(goal.trajectory.points)):
                 t = goal.trajectory.points[i].time_from_start
-                # rospy.loginfo("setting joints to %s, t: %s, time since start: %s" % ( str(goal.trajectory.points[i].positions), str(t), str(rospy.Time.now() - start_time)))
+                rospy.loginfo("setting joints to %s, t: %s, time since start: %s" % ( str(goal.trajectory.points[i].positions), str(t), str(rospy.Time.now() - start_time)))
                 
 
                 ## check for empty arrays:
@@ -185,7 +185,7 @@ class FollowJointAction():
     ######################################################################
         while not rospy.is_shutdown():
             rospy.sleep(10)
-        self.f.close()
+        # self.f.close()
             
         
   

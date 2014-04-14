@@ -1,0 +1,5 @@
+<launch>
+  <machine name="robot" address="$(env ROBOT)" env-loader="$(env ENV_LOADER)" user="jfstepha" timeout="240"/>
+  <node machine="robot" pkg="george" type="accel.py" name="accel" />
+  
+</launch>

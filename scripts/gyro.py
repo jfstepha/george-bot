@@ -28,7 +28,7 @@ class GyroMsgs():
         self.gyro.calibrate()
         self.gyroPub = rospy.Publisher( "gyros", Float32MultiArray)
         self.gyroSpinsPub =  rospy.Publisher( "gyros_spins", Int16)
-        self.rate = rospy.get_param('~rate', 1)
+        self.rate = rospy.get_param('~rate', 10)
         
 
 ##################################################################################################################

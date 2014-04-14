@@ -136,8 +136,8 @@ class messageHandler():
         self.jpc_pub = []
         rospy.init_node('jointstate_to_pi')
         
-        self.DOSERVO = rospy.get_param('do_servos','false')
-        ##self.DOSERVO = True
+        ###self.DOSERVO = rospy.get_param('do_servos','false')
+        self.DOSERVO = True
 
         if self.DOSERVO:
             from Adafruit_PWM_Servo_Driver.Adafruit_PWM_Servo_Driver import PWM

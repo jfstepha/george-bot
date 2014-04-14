@@ -1,8 +1,4 @@
-src/rqt_george/*.pyc
-src/*.pyc
-.project
-.pydevproject
-src/Adafruit_PWM_Servo_Driver/Adafruit_I2C.pyc
-src/Adafruit_PWM_Servo_Driver/Adafruit_PWM_Servo_Driver.pyc
-src/Adafruit_PWM_Servo_Driver/__init__.pyc
-scripts/robotDescription.pyc
+.gitignore
+*.pyc
+.gitignore
+scripts/follow_joint_trajectory.pyc
