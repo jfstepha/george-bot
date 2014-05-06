@@ -90,14 +90,14 @@ class FollowJointAction():
                 while rospy.Time.now() - start_time < t:
                     rospy.sleep(0.025)
 
-           #     if success:
-           #          rospy.loginfo("robot_action reached goal")
+                if success:
+                    rospy.loginfo("robot_action reached goal")
                     #self._feedback.actual.positions = self.robot_state
                     #self._as.publish_feedback(self._feedback)
-           #     if not success:
-           #         rospy.logerr("%s: error: did not reach goal" % self._action_name)
+                if not success:
+                    rospy.logerr("%s: error: did not reach goal" % self._action_name)
                     #self._as.set_aborted(self._result)
-           #         self._as.set_aborted()
+          #         self._as.set_aborted()
                     return 
                 # r.sleep()
             
@@ -105,7 +105,7 @@ class FollowJointAction():
         #self._as.publish_feedback(self._feedback)
           
         if success:
-          # rospy.loginfo('%s: Succeeded' % self._action_name)
+          rospy.loginfo('%s: Succeeded' % self._action_name)
           #self._as.set_succeeded(self._result)
           self._as.set_succeeded()
 

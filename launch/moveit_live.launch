@@ -1,5 +1,11 @@
 <launch>
   <machine name="robot" address="$(env ROBOT)" env-loader="$(env ENV_LOADER)" user="jfstepha" timeout="240"/>
+  <!-- these had machine="robot" -->
+  <node  ns="/joint0_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_rleg.py" output="screen"/>
+  <node  ns="/joint1_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_lleg.py" output="screen"/>
+  <node  ns="/joint2_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_larm.py" output="screen"/>
+  <node  ns="/joint3_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_rarm.py" output="screen"/>
+  
 
   <!-- By default, we do not start a database (it can be large) -->
   <arg name="db" default="true" />
@@ -29,11 +35,6 @@
     <arg name="debug" value="$(arg debug)"/>
   </include>
 
-  <node machine="robot" ns="/joint0_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_rleg.py" output="screen"/>
-  <node machine="robot" ns="/joint1_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_lleg.py" output="screen"/>
-  <node machine="robot" ns="/joint2_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_larm.py" output="screen"/>
-  <node machine="robot" ns="/joint3_position_controller" name="follow_joint_trajectory" pkg="george" type="follow_joint_trajectory_rarm.py" output="screen"/>
-  
   <!-- If database loading was enabled, start mongodb as well -->
   <include file="$(find george)/launch/default_warehouse_db.launch" if="$(arg db)"/>
 
